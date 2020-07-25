@@ -30,10 +30,6 @@ void UPDOnlineService::ProcessRequestQueue()
         return;
     }
 
-    // Register callbacks.
-    Request->OnSuccess.BindUObject(this, &UPDOnlineService::OnPendingRequestSuccess);
-    Request->OnError.BindUObject(this, &UPDOnlineService::OnPendingRequestError);
-
     // Execute request.
     UE_LOG(LogPDOnline, Log, TEXT("Executing request: %s"), *Request->ToString());
 
@@ -48,10 +44,6 @@ void UPDOnlineService::DequeueCurrentPendingRequest()
     {
         return;
     }
-
-    // Clear callbacks.
-    Request->OnSuccess.Unbind();
-    Request->OnError.Unbind();
 
     // Remove request.
     PendingRequests.RemoveAt(0);

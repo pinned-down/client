@@ -7,13 +7,17 @@ public class PinnedDown : ModuleRules
 	public PinnedDown(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-	
-		PublicDependencyModuleNames.AddRange(new string[]
+        bEnforceIWYU = true;
+
+        PublicDependencyModuleNames.AddRange(new string[]
         {
             "Core",
             "CoreUObject",
             "Engine",
             "InputCore",
+            "HTTP",
+            "Json",
+            "JsonUtilities",
             "Stomp"
         });
 

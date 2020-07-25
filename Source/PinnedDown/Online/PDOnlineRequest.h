@@ -2,25 +2,36 @@
 
 #include "CoreMinimal.h"
 
-DECLARE_DELEGATE(FPDOnlineRequestSuccessSignature);
-DECLARE_DELEGATE_OneParam(FPDOnlineRequestErrorSignature, const FString& /*ErrorMessage*/);
+#include "Interfaces/IHttpRequest.h"
+
+#include "Core/PDDelegate.h"
+#include "Online/PDOnlineError.h"
+
+#include "PDOnlineRequest.generated.h"
+
+DECLARE_DYNAMIC_DELEGATE_OneParam(FPDOnlineErrorSignature, const FString&, ErrorMessage);
 
 /** Request to send to a remote endpoint. */
-class PINNEDDOWN_API FPDOnlineRequest
+USTRUCT()
+struct PINNEDDOWN_API FPDOnlineRequest
 {
+    GENERATED_BODY()
+
 public:
+    FPDOnlineError Error;
+
     FPDOnlineRequest();
     virtual ~FPDOnlineRequest();
 
     /** Prepares and sends the request to the remote endpoint. */
-    virtual void Execute() = 0;
+    virtual void Execute();
 
     /** Gets a textual description of this request. */
-    virtual FString ToString() = 0;
-
-    /** Event when this request was successfully executed. */
-    FPDOnlineRequestSuccessSignature OnSuccess;
+    virtual FString ToString();
 
     /** Event when this request failed to execute. */
-    FPDOnlineRequestErrorSignature OnError;
+    PDDeclareDynamicMulticastDelegate(FPDOnlineErrorSignature, OnError);
+
+protected:
+    FString CheckForErrors(FHttpResponsePtr Response, bool bWasSuccessful);
 };

@@ -4,9 +4,11 @@
 
 #include "UObject/Object.h"
 
+#include "Online/PDOnlineRequest.h"
+
 #include "PDOnlineService.generated.h"
 
-class FPDOnlineRequest;
+struct FPDOnlineRequest;
 
 /** Provides common functionality for sending requests to remote endpoints. */
 UCLASS(BlueprintType)
@@ -18,6 +20,25 @@ protected:
     /** Adds the passed request to the request queue for processing. */
     bool AddRequest(TSharedPtr<FPDOnlineRequest> Request);
 
+    template<typename RequestType, typename SuccessCallbackType>
+    bool AddRequestWithCallbacks(TSharedPtr<RequestType> Request,
+        const SuccessCallbackType& OnSuccess, const SuccessCallbackType& OnServiceSuccess,
+        const FPDOnlineErrorSignature& OnError, const FPDOnlineErrorSignature& OnServiceError)
+    {
+        Request->OnSuccess.Add(OnServiceSuccess);
+        Request->OnSuccess.Add(OnSuccess);
+        Request->OnError.Add(OnServiceError);
+        Request->OnError.Add(OnError);
+
+        return AddRequest(Request);
+    }
+
+    UFUNCTION()
+    void OnPendingRequestSuccess();
+
+    UFUNCTION()
+    void OnPendingRequestError(const FString& ErrorMessage);
+
 private:
     TArray<TSharedPtr<FPDOnlineRequest>> PendingRequests;
 
@@ -26,12 +47,6 @@ private:
 
     /** Removes the current pending request from the queue, and executes the next one, if any. */
     void DequeueCurrentPendingRequest();
-
-    UFUNCTION()
-    void OnPendingRequestSuccess();
-
-    UFUNCTION()
-    void OnPendingRequestError(const FString& ErrorMessage);
 
     /** Gets the current in-flight request. */
     TSharedPtr<FPDOnlineRequest> GetCurrentPendingRequest() const;
