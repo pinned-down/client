@@ -7,6 +7,7 @@
 #include "PDGameInstance.generated.h"
 
 class UPDAuthService;
+class UPDMatchmakingService;
 class UPDOnlineHttpRequestBuilder;
 
 UCLASS()
@@ -20,10 +21,16 @@ public:
     UFUNCTION(BlueprintPure)
     UPDAuthService* GetAuthService() const;
 
+    UFUNCTION(BlueprintPure)
+    UPDMatchmakingService* GetMatchmakingService() const;
+
 private:
     UPROPERTY()
     UPDOnlineHttpRequestBuilder* HttpRequestBuilder;
 
     UPROPERTY()
     UPDAuthService* AuthService;
+
+    UPROPERTY()
+    UPDMatchmakingService* MatchmakingService;
 };
