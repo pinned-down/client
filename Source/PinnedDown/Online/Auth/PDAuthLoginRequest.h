@@ -23,7 +23,8 @@ public:
     FPDAuthLoginRequestData RequestData;
     FPDAuthLoginResponseData ResponseData;
 
-    PDDeclareDynamicMulticastDelegate(FPDAuthLoginSuccessSignature, OnSuccess);
+    FPDAuthLoginSuccessSignature OnSuccess;
+    FPDAuthLoginSuccessSignature OnServiceSuccess;
 
     virtual void Execute() override;
     virtual FString ToString() override;

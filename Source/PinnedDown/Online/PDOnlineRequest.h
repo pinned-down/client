@@ -30,8 +30,9 @@ public:
     virtual FString ToString();
 
     /** Event when this request failed to execute. */
-    PDDeclareDynamicMulticastDelegate(FPDOnlineErrorSignature, OnError);
+    FPDOnlineErrorSignature OnError;
+    FPDOnlineErrorSignature OnServiceError;
 
 protected:
-    FString CheckForErrors(FHttpResponsePtr Response, bool bWasSuccessful);
+    bool CheckForErrors(FHttpResponsePtr Response, bool bWasSuccessful);
 };

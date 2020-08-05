@@ -13,7 +13,7 @@ void FPDAuthLoginRequest::Execute()
 
     if (!Request->ProcessRequest())
     {
-        PDBroadcastDynamicMulticastDelegate(OnError, NSLOCTEXT("PinnedDownUI", "Error.UnableToConnect", "Unable to connect to server.").ToString());
+        OnServiceError.ExecuteIfBound(NSLOCTEXT("PinnedDownUI", "Error.UnableToConnect", "Unable to connect to server.").ToString());
         return;
     }
 }
@@ -25,11 +25,8 @@ FString FPDAuthLoginRequest::ToString()
 
 void FPDAuthLoginRequest::OnHttpResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
-    FString ErrorMessage = CheckForErrors(Response, bWasSuccessful);
-
-    if (!ErrorMessage.IsEmpty())
+    if (!CheckForErrors(Response, bWasSuccessful))
     {
-        PDBroadcastDynamicMulticastDelegate(OnError, ErrorMessage);
         return;
     }
 
@@ -37,5 +34,5 @@ void FPDAuthLoginRequest::OnHttpResponse(FHttpRequestPtr Request, FHttpResponseP
 
     UE_LOG(LogPDOnline, Log, TEXT("Login successful - Token: %s"), *ResponseData.Token);
 
-    PDBroadcastDynamicMulticastDelegate(OnSuccess, ResponseData);
+    OnServiceSuccess.ExecuteIfBound(ResponseData);
 }

@@ -3,24 +3,6 @@
 #include "PDOnlineLog.h"
 #include "PDOnlineRequest.h"
 
-bool UPDOnlineService::AddRequest(TSharedPtr<FPDOnlineRequest> Request)
-{
-    if (!Request.IsValid())
-    {
-        return false;
-    }
-
-    // Enqueue request.
-    PendingRequests.Add(Request);
-
-    if (PendingRequests.Num() == 1)
-    {
-        ProcessRequestQueue();
-    }
-
-    return true;
-}
-
 void UPDOnlineService::ProcessRequestQueue()
 {
     TSharedPtr<FPDOnlineRequest> Request = GetCurrentPendingRequest();
@@ -53,34 +35,6 @@ void UPDOnlineService::DequeueCurrentPendingRequest()
     {
         ProcessRequestQueue();
     }
-}
-
-void UPDOnlineService::OnPendingRequestSuccess()
-{
-    TSharedPtr<FPDOnlineRequest> Request = GetCurrentPendingRequest();
-
-    if (!Request.IsValid())
-    {
-        return;
-    }
-
-    UE_LOG(LogPDOnline, Log, TEXT("Sucessfully executed request."));
-
-    DequeueCurrentPendingRequest();
-}
-
-void UPDOnlineService::OnPendingRequestError(const FString& ErrorMessage)
-{
-    TSharedPtr<FPDOnlineRequest> Request = GetCurrentPendingRequest();
-
-    if (!Request.IsValid())
-    {
-        return;
-    }
-
-    UE_LOG(LogPDOnline, Error, TEXT("Failed to execute request: %s"), *ErrorMessage);
-
-    DequeueCurrentPendingRequest();
 }
 
 TSharedPtr<FPDOnlineRequest> UPDOnlineService::GetCurrentPendingRequest() const

@@ -4,12 +4,12 @@
 
 #include "PDAuthRegisterResponseData.generated.h"
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct PINNEDDOWN_API FPDAuthRegisterResponseData
 {
     GENERATED_BODY()
 
 public:
-    UPROPERTY()
+    UPROPERTY(BlueprintReadOnly)
     FString PlayerId;
 };

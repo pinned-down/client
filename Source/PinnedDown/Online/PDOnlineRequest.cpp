@@ -3,6 +3,7 @@
 #include "Interfaces/IHttpResponse.h"
 
 #include "PDOnlineLibrary.h"
+#include "PDOnlineLog.h"
 
 FPDOnlineRequest::FPDOnlineRequest()
 {
@@ -21,18 +22,33 @@ FString FPDOnlineRequest::ToString()
     return TEXT("FPDOnlineRequest");
 }
 
-FString FPDOnlineRequest::CheckForErrors(FHttpResponsePtr Response, bool bWasSuccessful)
+bool FPDOnlineRequest::CheckForErrors(FHttpResponsePtr Response, bool bWasSuccessful)
 {
+    FString ErrorMessage;
+
     if (!bWasSuccessful || !Response.IsValid())
     {
-        return NSLOCTEXT("PinnedDownUI", "Error.UnableToConnect", "Unable to connect to server.").ToString();
+        ErrorMessage = NSLOCTEXT("PinnedDownUI", "Error.UnableToConnect", "Unable to connect to server.").ToString();
     }
 
     if (!EHttpResponseCodes::IsOk(Response->GetResponseCode()))
     {
         FJsonObjectConverter::JsonObjectStringToUStruct<FPDOnlineError>(Response->GetContentAsString(), &Error, 0, 0);
-        return UPDOnlineLibrary::LocalizeError(Error);
+        ErrorMessage = UPDOnlineLibrary::LocalizeError(Error);
+
+        if (ErrorMessage.IsEmpty())
+        {
+            UE_LOG(LogPDOnline, Error, TEXT("%s"), *Response->GetContentAsString());
+
+            ErrorMessage = NSLOCTEXT("PinnedDownUI", "Error.UnableToConnect", "Unable to connect to server.").ToString();
+        }
     }
 
-    return TEXT("");
+    if (!ErrorMessage.IsEmpty())
+    {
+        OnServiceError.ExecuteIfBound(ErrorMessage);
+        return false;
+    }
+
+    return true;
 }

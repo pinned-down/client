@@ -13,7 +13,7 @@ void FPDAuthRegisterRequest::Execute()
     
     if (!Request->ProcessRequest())
     {
-        PDBroadcastDynamicMulticastDelegate(OnError, NSLOCTEXT("PinnedDownUI", "Error.UnableToConnect", "Unable to connect to server.").ToString());
+        OnServiceError.ExecuteIfBound(NSLOCTEXT("PinnedDownUI", "Error.UnableToConnect", "Unable to connect to server.").ToString());
         return;
     }
 }
@@ -25,11 +25,8 @@ FString FPDAuthRegisterRequest::ToString()
 
 void FPDAuthRegisterRequest::OnHttpResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
-    FString ErrorMessage = CheckForErrors(Response, bWasSuccessful);
-
-    if (!ErrorMessage.IsEmpty())
+    if (!CheckForErrors(Response, bWasSuccessful))
     {
-        PDBroadcastDynamicMulticastDelegate(OnError, ErrorMessage);
         return;
     }
     
@@ -37,5 +34,5 @@ void FPDAuthRegisterRequest::OnHttpResponse(FHttpRequestPtr Request, FHttpRespon
 
     UE_LOG(LogPDOnline, Log, TEXT("Account created - PlayerId: %s"), *ResponseData.PlayerId);
 
-    PDBroadcastDynamicMulticastDelegate(OnSuccess, ResponseData);
+    OnServiceSuccess.ExecuteIfBound(ResponseData);
 }

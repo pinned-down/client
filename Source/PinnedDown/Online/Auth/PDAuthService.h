@@ -10,7 +10,7 @@
 
 #include "PDAuthService.generated.h"
 
-UCLASS(BlueprintType)
+UCLASS(BlueprintType, Config=Game)
 class PINNEDDOWN_API UPDAuthService : public UPDOnlineService
 {
     GENERATED_BODY()
@@ -22,12 +22,22 @@ public:
     UFUNCTION(BlueprintCallable)
     void Login(const FPDAuthLoginSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError);
 
+    UFUNCTION(BlueprintPure)
+    FString GetPlayerId() const;
+
 private:
+    UPROPERTY(Config)
     FString PlayerId;
 
     UFUNCTION()
     void OnRegisterSuccess(const FPDAuthRegisterResponseData& Response);
 
     UFUNCTION()
+    void OnRegisterError(const FString& ErrorMessage);
+
+    UFUNCTION()
     void OnLoginSuccess(const FPDAuthLoginResponseData& Response);
+
+    UFUNCTION()
+    void OnLoginError(const FString& ErrorMessage);
 };
