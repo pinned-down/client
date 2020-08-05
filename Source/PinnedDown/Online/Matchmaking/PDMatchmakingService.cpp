@@ -25,12 +25,34 @@ void UPDMatchmakingService::Enqueue(const FPDMatchmakingEnqueueRequestData& Requ
     AddRequest(Request, OnSuccess, OnServiceSuccess, OnError, OnServiceError);
 }
 
+void UPDMatchmakingService::Dequeue(const FPDMatchmakingDequeueSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError)
+{
+    PDCreateDynamicDelegate(FPDMatchmakingDequeueSuccessSignature, OnServiceSuccess, &UPDMatchmakingService::OnDequeueSuccess);
+    PDCreateDynamicDelegate(FPDOnlineErrorSignature, OnServiceError, &UPDMatchmakingService::OnDequeueError);
+
+    TSharedPtr<FPDMatchmakingDequeueRequest> Request = MakeShared<FPDMatchmakingDequeueRequest>();
+    Request->HttpRequestBuilder = HttpRequestBuilder;
+    Request->RequestData.PlayerId = AuthService->GetPlayerId();
+
+    AddRequest(Request, OnSuccess, OnServiceSuccess, OnError, OnServiceError);
+}
+
 void UPDMatchmakingService::OnEnqueueSuccess(const FPDMatchmakingEnqueueResponseData& Response)
 {
     OnPendingRequestSuccess<FPDMatchmakingEnqueueRequest, FPDMatchmakingEnqueueResponseData>(Response);
 }
 
 void UPDMatchmakingService::OnEnqueueError(const FString& ErrorMessage)
+{
+    OnPendingRequestError(ErrorMessage);
+}
+
+void UPDMatchmakingService::OnDequeueSuccess(const FPDMatchmakingDequeueResponseData& Response)
+{
+    OnPendingRequestSuccess<FPDMatchmakingDequeueRequest, FPDMatchmakingDequeueResponseData>(Response);
+}
+
+void UPDMatchmakingService::OnDequeueError(const FString& ErrorMessage)
 {
     OnPendingRequestError(ErrorMessage);
 }
