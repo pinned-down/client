@@ -7,6 +7,7 @@
 #include "PDGameInstance.generated.h"
 
 class UPDAuthService;
+class UPDOnlineHttpRequestBuilder;
 
 UCLASS()
 class PINNEDDOWN_API UPDGameInstance : public UGameInstance
@@ -20,6 +21,9 @@ public:
     UPDAuthService* GetAuthService() const;
 
 private:
+    UPROPERTY()
+    UPDOnlineHttpRequestBuilder* HttpRequestBuilder;
+
     UPROPERTY()
     UPDAuthService* AuthService;
 };

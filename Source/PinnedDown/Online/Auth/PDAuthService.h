@@ -10,12 +10,16 @@
 
 #include "PDAuthService.generated.h"
 
+class UPDOnlineHttpRequestBuilder;
+
 UCLASS(BlueprintType, Config=Game)
 class PINNEDDOWN_API UPDAuthService : public UPDOnlineService
 {
     GENERATED_BODY()
 
 public:
+    void Init(UPDOnlineHttpRequestBuilder* InHttpRequestBuilder);
+
     UFUNCTION(BlueprintCallable)
     void Register(const FPDAuthRegisterRequestData& RequestData, const FPDAuthRegisterSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError);
 
@@ -26,6 +30,9 @@ public:
     FString GetPlayerId() const;
 
 private:
+    UPROPERTY()
+    UPDOnlineHttpRequestBuilder* HttpRequestBuilder;
+
     UPROPERTY(Config)
     FString PlayerId;
 

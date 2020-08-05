@@ -2,12 +2,12 @@
 
 #include "Interfaces/IHttpResponse.h"
 
-#include "Online/PDOnlineLibrary.h"
+#include "Online/PDOnlineHttpRequestBuilder.h"
 #include "Online/PDOnlineLog.h"
 
 void FPDAuthRegisterRequest::Execute()
 {
-    TSharedRef<IHttpRequest> Request = UPDOnlineLibrary::CreateHttpRequest(TEXT("/open-game-backend-auth/register"), RequestData);
+    TSharedRef<IHttpRequest> Request = HttpRequestBuilder->CreateHttpRequest(TEXT("/open-game-backend-auth/register"), RequestData);
 
     Request->OnProcessRequestComplete().BindRaw(this, &FPDAuthRegisterRequest::OnHttpResponse);
     

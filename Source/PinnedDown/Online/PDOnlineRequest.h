@@ -9,6 +9,8 @@
 
 #include "PDOnlineRequest.generated.h"
 
+class UPDOnlineHttpRequestBuilder;
+
 DECLARE_DYNAMIC_DELEGATE_OneParam(FPDOnlineErrorSignature, const FString&, ErrorMessage);
 
 /** Request to send to a remote endpoint. */
@@ -18,6 +20,9 @@ struct PINNEDDOWN_API FPDOnlineRequest
     GENERATED_BODY()
 
 public:
+    UPROPERTY()
+    UPDOnlineHttpRequestBuilder* HttpRequestBuilder;
+
     FPDOnlineError Error;
 
     FPDOnlineRequest();
