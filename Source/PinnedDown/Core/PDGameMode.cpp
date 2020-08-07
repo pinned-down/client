@@ -4,6 +4,8 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "Core/PDLog.h"
+#include "Core/PDGameInstance.h"
+#include "Online/Auth/PDAuthService.h"
 
 void APDGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
@@ -33,11 +35,28 @@ void APDGameMode::OnConnected(const FString& ProtocolVersion, const FString& Ses
 {
     UE_LOG(LogPD, Log, TEXT("APDGameMode::OnConnected - ProtocolVersion: %s, SessionId: %s, ServerString: %s"), *ProtocolVersion, *SessionId, *ServerString);
 
+    // Subscribe for messages.
     FStompSubscriptionEvent StompSubscriptionEvent = FStompSubscriptionEvent::CreateUObject(this, &APDGameMode::OnMessage);
     StompClient->Subscribe(TEXT("/topic/messages"), StompSubscriptionEvent);
 
-    // TODO(np): Serialize from UObject, and set player id from AuthService.
-    StompClient->Send(TEXT("/app/join"), TEXT("{\"playerId\": \"Nick\"}"));
+    // Send join message.
+    UPDGameInstance* GameInstance = GetGameInstance<UPDGameInstance>();
+
+    if (!IsValid(GameInstance))
+    {
+        return;
+    }
+
+    UPDAuthService* AuthService = GameInstance->GetAuthService();
+
+    if (!IsValid(AuthService))
+    {
+        return;
+    }
+
+    // TODO(np): Serialize from UObject.
+    // TODO(np): Handle missing handshake response.
+    StompClient->Send(TEXT("/app/join"), TEXT("{\"playerId\": \"") + AuthService->GetPlayerId() + TEXT("\"}"));
 }
 
 void APDGameMode::OnConnectionError(const FString& Error)
