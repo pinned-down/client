@@ -7,6 +7,7 @@
 #include "Online/PDOnlineRequest.h"
 #include "Online/Matchmaking/PDMatchmakingEnqueueRequest.h"
 #include "Online/Matchmaking/PDMatchmakingDequeueRequest.h"
+#include "Online/Matchmaking/PDMatchmakingPollRequest.h"
 
 #include "PDMatchmakingService.generated.h"
 
@@ -27,6 +28,9 @@ public:
     UFUNCTION(BlueprintCallable)
     void Dequeue(const FPDMatchmakingDequeueSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError);
 
+    UFUNCTION(BlueprintCallable)
+    void Poll(const FPDMatchmakingPollSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError);
+
 private:
     UPROPERTY()
     UPDOnlineHttpRequestBuilder* HttpRequestBuilder;
@@ -45,4 +49,10 @@ private:
 
     UFUNCTION()
     void OnDequeueError(const FString& ErrorMessage);
+
+    UFUNCTION()
+    void OnPollSuccess(const FPDMatchmakingPollResponseData& Response);
+
+    UFUNCTION()
+    void OnPollError(const FString& ErrorMessage);
 };

@@ -37,6 +37,18 @@ void UPDMatchmakingService::Dequeue(const FPDMatchmakingDequeueSuccessSignature&
     AddRequest(Request, OnSuccess, OnServiceSuccess, OnError, OnServiceError);
 }
 
+void UPDMatchmakingService::Poll(const FPDMatchmakingPollSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError)
+{
+    PDCreateDynamicDelegate(FPDMatchmakingPollSuccessSignature, OnServiceSuccess, &UPDMatchmakingService::OnPollSuccess);
+    PDCreateDynamicDelegate(FPDOnlineErrorSignature, OnServiceError, &UPDMatchmakingService::OnPollError);
+
+    TSharedPtr<FPDMatchmakingPollRequest> Request = MakeShared<FPDMatchmakingPollRequest>();
+    Request->HttpRequestBuilder = HttpRequestBuilder;
+    Request->RequestData.PlayerId = AuthService->GetPlayerId();
+
+    AddRequest(Request, OnSuccess, OnServiceSuccess, OnError, OnServiceError);
+}
+
 void UPDMatchmakingService::OnEnqueueSuccess(const FPDMatchmakingEnqueueResponseData& Response)
 {
     OnPendingRequestSuccess<FPDMatchmakingEnqueueRequest, FPDMatchmakingEnqueueResponseData>(Response);
@@ -53,6 +65,16 @@ void UPDMatchmakingService::OnDequeueSuccess(const FPDMatchmakingDequeueResponse
 }
 
 void UPDMatchmakingService::OnDequeueError(const FString& ErrorMessage)
+{
+    OnPendingRequestError(ErrorMessage);
+}
+
+void UPDMatchmakingService::OnPollSuccess(const FPDMatchmakingPollResponseData& Response)
+{
+    OnPendingRequestSuccess<FPDMatchmakingPollRequest, FPDMatchmakingPollResponseData>(Response);
+}
+
+void UPDMatchmakingService::OnPollError(const FString& ErrorMessage)
 {
     OnPendingRequestError(ErrorMessage);
 }
