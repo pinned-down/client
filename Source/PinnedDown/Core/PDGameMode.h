@@ -1,5 +1,3 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -8,15 +6,15 @@
 #include "IStompClient.h"
 #include "IStompMessage.h"
 
-#include "PinnedDownGameModeBase.generated.h"
+#include "PDGameMode.generated.h"
 
 UCLASS()
-class PINNEDDOWN_API APinnedDownGameModeBase : public AGameModeBase
+class PINNEDDOWN_API APDGameMode : public AGameModeBase
 {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
 public:
-    virtual void BeginPlay() override;
+    virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 
 private:
     TSharedPtr<IStompClient> StompClient;
