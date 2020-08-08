@@ -1,16 +1,22 @@
 #include "PDGameMode.h"
 
+#include "JsonObjectConverter.h"
 #include "StompModule.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "Core/PDLog.h"
 #include "Core/PDGameInstance.h"
+#include "Events/PDEventManager.h"
 #include "Online/Auth/PDAuthService.h"
 
 void APDGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
     Super::InitGame(MapName, Options, ErrorMessage);
 
+    // Setup game.
+    EventManager = NewObject<UPDEventManager>(this);
+
+    // Connect to server.
     FString ServerEndpoint = UGameplayStatics::ParseOption(Options, TEXT("server"));
 
     if (ServerEndpoint.IsEmpty())
@@ -29,6 +35,11 @@ void APDGameMode::InitGame(const FString& MapName, const FString& Options, FStri
     StompClient->OnError().AddUObject(this, &APDGameMode::OnError);
 
     StompClient->Connect();
+}
+
+UPDEventManager* APDGameMode::GetEventManager() const
+{
+    return EventManager;
 }
 
 void APDGameMode::OnConnected(const FString& ProtocolVersion, const FString& SessionId, const FString& ServerString)
@@ -67,8 +78,46 @@ void APDGameMode::OnConnectionError(const FString& Error)
 
 void APDGameMode::OnMessage(const IStompMessage& Message)
 {
-    // TODO(np): Handle message.
-    UE_LOG(LogPD, Log, TEXT("APDGameMode::OnMessage - %s"), *Message.GetBodyAsString());
+    UE_LOG(LogPD, Verbose, TEXT("APDGameMode::OnMessage - %s"), *Message.GetBodyAsString());
+
+    // Deserialize message.
+    TSharedPtr<FJsonObject> MessageJsonObject;
+    TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Message.GetBodyAsString());
+    FJsonSerializer::Deserialize(Reader, MessageJsonObject);
+
+    FString MessageType = MessageJsonObject->GetStringField(TEXT("messageType"));
+    TSharedPtr<FJsonObject> MessageData = MessageJsonObject->GetObjectField(TEXT("messageData"));
+
+    // Get message type.
+    int32 LastIndex;
+    MessageType.FindLastChar('.', LastIndex);
+
+    MessageType = MessageType.Mid(LastIndex + 1);
+    MessageType = TEXT("PD") + MessageType;
+
+    // Create message data object.
+    UObject* ClassPackage = ANY_PACKAGE;
+
+    UClass* MessageClass = FindObject<UClass>(ClassPackage, *MessageType);
+
+    if (!MessageClass)
+    {
+        if (UObjectRedirector* RenamedClassRedirector = FindObject<UObjectRedirector>(ClassPackage, *MessageType))
+        {
+            MessageClass = CastChecked<UClass>(RenamedClassRedirector->DestinationObject);
+        }
+    }
+
+    if (!MessageClass)
+    {
+        UE_LOG(LogPD, Error, TEXT("APDGameMode::OnMessage - Unknown MessageClass: %s"), *MessageType);
+    }
+
+    UObject* Obj = NewObject<UObject>(this, MessageClass);
+    FJsonObjectConverter::JsonObjectToUStruct(MessageData.ToSharedRef(), MessageClass, Obj);
+
+    // Raise event.
+    EventManager->RaiseEvent(MessageType, Obj);
 }
 
 void APDGameMode::OnError(const FString& Error)
