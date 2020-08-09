@@ -8,6 +8,7 @@
 
 #include "PDGameMode.generated.h"
 
+class UPDAction;
 class UPDEventManager;
 
 UCLASS()
@@ -17,6 +18,8 @@ class PINNEDDOWN_API APDGameMode : public AGameModeBase
 
 public:
     virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+
+    void SendActionToServer(UPDAction* Action);
 
     UFUNCTION(BlueprintPure)
     UPDEventManager* GetEventManager() const;

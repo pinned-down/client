@@ -6,7 +6,9 @@
 
 #include "Core/PDLog.h"
 #include "Core/PDGameInstance.h"
+#include "Events/PDAction.h"
 #include "Events/PDEventManager.h"
+#include "Events/EventData/PDJoinGameAction.h"
 #include "Online/Auth/PDAuthService.h"
 
 void APDGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -37,6 +39,16 @@ void APDGameMode::InitGame(const FString& MapName, const FString& Options, FStri
     StompClient->Connect();
 }
 
+void APDGameMode::SendActionToServer(UPDAction* Action)
+{
+    FString Endpoint = TEXT("/game") + Action->Endpoint;
+
+    FString JsonString;
+    FJsonObjectConverter::UStructToJsonObjectString(Action->GetClass(), Action, JsonString, 0, 0);
+
+    StompClient->Send(Endpoint, JsonString);
+}
+
 UPDEventManager* APDGameMode::GetEventManager() const
 {
     return EventManager;
@@ -48,7 +60,7 @@ void APDGameMode::OnConnected(const FString& ProtocolVersion, const FString& Ses
 
     // Subscribe for messages.
     FStompSubscriptionEvent StompSubscriptionEvent = FStompSubscriptionEvent::CreateUObject(this, &APDGameMode::OnMessage);
-    StompClient->Subscribe(TEXT("/topic/messages"), StompSubscriptionEvent);
+    StompClient->Subscribe(TEXT("/topic/events"), StompSubscriptionEvent);
 
     // Send join message.
     UPDGameInstance* GameInstance = GetGameInstance<UPDGameInstance>();
@@ -65,9 +77,11 @@ void APDGameMode::OnConnected(const FString& ProtocolVersion, const FString& Ses
         return;
     }
 
-    // TODO(np): Serialize from UObject.
     // TODO(np): Handle missing handshake response.
-    StompClient->Send(TEXT("/app/join"), TEXT("{\"playerId\": \"") + AuthService->GetPlayerId() + TEXT("\"}"));
+    UPDJoinGameAction* JoinAction = NewObject<UPDJoinGameAction>(this);
+    JoinAction->PlayerId = AuthService->GetPlayerId();
+
+    SendActionToServer(JoinAction);
 }
 
 void APDGameMode::OnConnectionError(const FString& Error)
@@ -78,7 +92,7 @@ void APDGameMode::OnConnectionError(const FString& Error)
 
 void APDGameMode::OnMessage(const IStompMessage& Message)
 {
-    UE_LOG(LogPD, Verbose, TEXT("APDGameMode::OnMessage - %s"), *Message.GetBodyAsString());
+    UE_LOG(LogPD, Log, TEXT("APDGameMode::OnMessage - %s"), *Message.GetBodyAsString());
 
     // Deserialize message.
     TSharedPtr<FJsonObject> MessageJsonObject;
