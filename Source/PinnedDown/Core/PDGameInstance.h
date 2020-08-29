@@ -6,7 +6,10 @@
 
 #include "PDGameInstance.generated.h"
 
+class UDataTable;
+
 class UPDAuthService;
+class UPDCardSet;
 class UPDMatchmakingService;
 class UPDOnlineHttpRequestBuilder;
 
@@ -22,6 +25,12 @@ public:
     UPDAuthService* GetAuthService() const;
 
     UFUNCTION(BlueprintPure)
+    UPDCardSet* GetCardSet() const;
+
+    UFUNCTION(BlueprintPure)
+    UDataTable* GetCardMetadata() const;
+
+    UFUNCTION(BlueprintPure)
     UPDMatchmakingService* GetMatchmakingService() const;
 
 private:
@@ -33,4 +42,10 @@ private:
 
     UPROPERTY()
     UPDMatchmakingService* MatchmakingService;
+
+    UPROPERTY()
+    UPDCardSet* CardSet;
+
+    UPROPERTY(EditDefaultsOnly)
+    UDataTable* CardMetadata;
 };
