@@ -26,27 +26,6 @@ public:
 
     TArray<FName> GetCardIds() const;
 
-    UFUNCTION(BlueprintPure)
-    TArray<FName> GetCardTags(const FName& CardId) const;
-
-    UFUNCTION(BlueprintPure)
-    EPDCardType GetCardType(const FName& CardId) const;
-
-    UFUNCTION(BlueprintPure)
-    int32 GetCardThreat(const FName& CardId) const;
-
-    UFUNCTION(BlueprintPure)
-    EPDCardAffiliation GetCardAffiliation(const FName& CardId) const;
-
-    UFUNCTION(BlueprintPure)
-    int32 GetCardPower(const FName& CardId) const;
-
-    UFUNCTION(BlueprintPure)
-    int32 GetCardDistance(const FName& CardId) const;
-
-    UFUNCTION(BlueprintPure)
-    int32 GetCardDamage(const FName& CardId) const;
-
     TSharedPtr<FJsonObject> GetCardAttributes(const FName& CardId) const;
 
 private:
