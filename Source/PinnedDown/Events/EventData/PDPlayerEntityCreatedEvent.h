@@ -4,14 +4,17 @@
 
 #include "UObject/Object.h"
 
-#include "PDPlayerJoinedEvent.generated.h"
+#include "PDPlayerEntityCreatedEvent.generated.h"
 
 UCLASS(BlueprintType)
-class PINNEDDOWN_API UPDPlayerJoinedEvent : public UObject
+class PINNEDDOWN_API UPDPlayerEntityCreatedEvent : public UObject
 {
     GENERATED_BODY()
 
 public:
     UPROPERTY(BlueprintReadWrite)
     FString PlayerId;
+
+    UPROPERTY(BlueprintReadWrite)
+    int64 EntityId;
 };
