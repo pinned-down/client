@@ -125,6 +125,7 @@ void APDGameMode::OnMessage(const IStompMessage& Message)
     if (!MessageClass)
     {
         UE_LOG(LogPD, Error, TEXT("APDGameMode::OnMessage - Unknown MessageClass: %s"), *MessageType);
+        return;
     }
 
     UObject* Obj = NewObject<UObject>(this, MessageClass);
