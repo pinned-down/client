@@ -11,6 +11,9 @@
 class APDCardActor;
 class UPDEventManager;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerCardHoveredSignature, APDCardActor*, HoveredActor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerCardUnhoveredSignature, APDCardActor*, UnhoveredActor);
+
 UCLASS(BlueprintType, Blueprintable)
 class PINNEDDOWN_API UPDCardActorManager : public UObject
 {
@@ -20,6 +23,12 @@ public:
     UPDCardActorManager(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
     void Init(UPDEventManager* InEventManager);
+
+    UPROPERTY(BlueprintAssignable)
+    FPDCardActorManagerCardHoveredSignature OnCardHovered;
+
+    UPROPERTY(BlueprintAssignable)
+    FPDCardActorManagerCardUnhoveredSignature OnCardUnhovered;
 
 private:
     UPROPERTY(EditDefaultsOnly)
@@ -42,4 +51,10 @@ private:
 
     UFUNCTION()
     void OnPlayerHandChanged(const UObject* EventData);
+
+    UFUNCTION()
+    void OnBeginCursorOver(AActor* TouchedActor);
+
+    UFUNCTION()
+    void OnEndCursorOver(AActor* TouchedActor);
 };

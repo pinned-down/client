@@ -48,7 +48,7 @@ void UPDCardActorManager::OnPlayerHandChanged(const UObject* EventData)
     HandCards.Empty();
 
     // Create hand card actors.
-    FVector CardPadding;
+    FVector CardPadding = FVector::ZeroVector;
 
     for (const FString& CardName : PlayerHandChangedEvent->Cards)
     {
@@ -57,10 +57,22 @@ void UPDCardActorManager::OnPlayerHandChanged(const UObject* EventData)
         if (IsValid(CardActor))
         {
             CardActor->Init(0, FName(CardName));
+            CardActor->OnBeginCursorOver.AddDynamic(this, &UPDCardActorManager::OnBeginCursorOver);
+            CardActor->OnEndCursorOver.AddDynamic(this, &UPDCardActorManager::OnEndCursorOver);
 
             CardPadding += PlayerHandCardPadding;
 
             HandCards.Add(CardActor);
         }
     }
+}
+
+void UPDCardActorManager::OnBeginCursorOver(AActor* TouchedActor)
+{
+    OnCardHovered.Broadcast(Cast<APDCardActor>(TouchedActor));
+}
+
+void UPDCardActorManager::OnEndCursorOver(AActor* TouchedActor)
+{
+    OnCardUnhovered.Broadcast(Cast<APDCardActor>(TouchedActor));
 }

@@ -14,6 +14,10 @@ void APDPlayerController::BeginPlay()
 {
     Super::BeginPlay();
 
+    // Show mouse cursor.
+    bShowMouseCursor = true;
+
+    // Register for events.
     APDGameMode* GameMode = Cast<APDGameMode>(UGameplayStatics::GetGameMode(this));
 
     if (!IsValid(GameMode))
