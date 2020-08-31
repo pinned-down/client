@@ -40,6 +40,15 @@ private:
     UPROPERTY(EditDefaultsOnly)
     FVector PlayerHandCardPadding;
 
+    UPROPERTY(EditDefaultsOnly)
+    FVector LocationCardLocation;
+
+    UPROPERTY(EditDefaultsOnly)
+    FVector PlayerShipsStartLocation;
+
+    UPROPERTY(EditDefaultsOnly)
+    FVector PlayerShipsCardPadding;
+
     UPROPERTY()
     UPDEventManager* EventManager;
 
@@ -49,12 +58,26 @@ private:
     UPROPERTY()
     TArray<APDCardActor*> HandCards;
 
+    UPROPERTY()
+    TArray<APDCardActor*> LocalPlayerCards;
+
+    UPROPERTY()
+    APDCardActor* CurrentLocationCard;
+
     UFUNCTION()
     void OnPlayerHandChanged(const UObject* EventData);
+
+    UFUNCTION()
+    void OnCurrentLocationChanged(const UObject* EventData);
+
+    UFUNCTION()
+    void OnCardPlayed(const UObject* EventData);
 
     UFUNCTION()
     void OnBeginCursorOver(AActor* TouchedActor);
 
     UFUNCTION()
     void OnEndCursorOver(AActor* TouchedActor);
+
+    void InitCardActor(APDCardActor* CardActor, int64 EntityId, const FString& CardId);
 };
