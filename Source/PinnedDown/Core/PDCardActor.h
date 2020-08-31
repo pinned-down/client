@@ -24,6 +24,9 @@ public:
     UFUNCTION(BlueprintCallable)
     void Init(int64 InEntityId, const FName& InCardId);
 
+    UFUNCTION(BlueprintImplementableEvent)
+    void OnCardInitialized(int64 InEntityId, const FName& InCardId);
+
 private:
     UPROPERTY(VisibleAnywhere)
     int64 EntityId;

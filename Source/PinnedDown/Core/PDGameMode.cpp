@@ -11,12 +11,21 @@
 #include "Events/EventData/PDJoinGameAction.h"
 #include "Online/Auth/PDAuthService.h"
 
+APDGameMode::APDGameMode(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+    : Super(ObjectInitializer)
+{
+    CardActorManagerClass = UPDCardActorManager::StaticClass();
+}
+
 void APDGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
     Super::InitGame(MapName, Options, ErrorMessage);
 
     // Setup game.
     EventManager = NewObject<UPDEventManager>(this);
+
+    CardActorManager = NewObject<UPDCardActorManager>(this, CardActorManagerClass);
+    CardActorManager->Init(EventManager);
 
     // Connect to server.
     FString ServerEndpoint = UGameplayStatics::ParseOption(Options, TEXT("server"));
@@ -52,6 +61,11 @@ void APDGameMode::SendActionToServer(UPDAction* Action)
 UPDEventManager* APDGameMode::GetEventManager() const
 {
     return EventManager;
+}
+
+UPDCardActorManager* APDGameMode::GetCardActorManager() const
+{
+    return CardActorManager;
 }
 
 void APDGameMode::OnConnected(const FString& ProtocolVersion, const FString& SessionId, const FString& ServerString)

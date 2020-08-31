@@ -67,4 +67,7 @@ void APDCardActor::Init(int64 InEntityId, const FName& InCardId)
             }
         }
     }
+
+    // Notify listeners.
+    OnCardInitialized(EntityId, CardId);
 }
