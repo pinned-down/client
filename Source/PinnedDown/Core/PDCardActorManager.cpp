@@ -140,9 +140,15 @@ void UPDCardActorManager::OnEndCursorOver(AActor* TouchedActor)
     OnCardUnhovered.Broadcast(Cast<APDCardActor>(TouchedActor));
 }
 
+void UPDCardActorManager::OnClicked(AActor* TouchedActor, FKey ButtonPressed)
+{
+    OnCardClicked.Broadcast(Cast<APDCardActor>(TouchedActor));
+}
+
 void UPDCardActorManager::InitCardActor(APDCardActor* CardActor, int64 EntityId, const FString& CardId)
 {
     CardActor->Init(EntityId, FName(CardId));
     CardActor->OnBeginCursorOver.AddDynamic(this, &UPDCardActorManager::OnBeginCursorOver);
     CardActor->OnEndCursorOver.AddDynamic(this, &UPDCardActorManager::OnEndCursorOver);
+    CardActor->OnClicked.AddDynamic(this, &UPDCardActorManager::OnClicked);
 }
