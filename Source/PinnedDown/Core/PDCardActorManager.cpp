@@ -155,4 +155,6 @@ void UPDCardActorManager::InitCardActor(APDCardActor* CardActor, int64 EntityId,
     CardActor->OnBeginCursorOver.AddDynamic(this, &UPDCardActorManager::OnBeginCursorOver);
     CardActor->OnEndCursorOver.AddDynamic(this, &UPDCardActorManager::OnEndCursorOver);
     CardActor->OnClicked.AddDynamic(this, &UPDCardActorManager::OnClicked);
+
+    Cards.Add(EntityId, CardActor);
 }
