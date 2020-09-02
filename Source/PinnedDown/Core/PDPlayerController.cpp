@@ -146,5 +146,9 @@ void APDPlayerController::SendActionToServer(UPDAction* Action)
 void APDPlayerController::SetUIMode(UPDUIMode* NewUIMode)
 {
     UIMode = NewUIMode;
-    UIMode->Init(this);
+
+    if (IsValid(UIMode))
+    {
+        UIMode->Init(this);
+    }
 }
