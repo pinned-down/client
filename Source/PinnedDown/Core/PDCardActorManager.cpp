@@ -5,10 +5,12 @@
 #include "Core/PDCardActor.h"
 #include "Core/PDDelegate.h"
 #include "Core/PDPlayerController.h"
+#include "Data/Components/PDOwnerComponent.h"
 #include "Events/PDEventManager.h"
 #include "Events/EventData/PDCardPlayedEvent.h"
 #include "Events/EventData/PDCurrentLocationChangedEvent.h"
 #include "Events/EventData/PDPlayerHandChangedEvent.h"
+#include "Events/EventData/PDStarshipAssignedEvent.h"
 
 UPDCardActorManager::UPDCardActorManager(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
     : Super(ObjectInitializer)
@@ -29,6 +31,9 @@ void UPDCardActorManager::Init(UPDEventManager* InEventManager)
 
     PDCreateDynamicDelegate(FPDEventListenerSignature, OnCardPlayed, &UPDCardActorManager::OnCardPlayed);
     EventManager->AddListener(TEXT("PDCardPlayedEvent"), OnCardPlayed);
+
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnStarshipAssigned, &UPDCardActorManager::OnStarshipAssigned);
+    EventManager->AddListener(TEXT("PDStarshipAssignedEvent"), OnStarshipAssigned);
 }
 
 void UPDCardActorManager::OnPlayerHandChanged(const UObject* EventData)
@@ -131,6 +136,19 @@ void UPDCardActorManager::OnCardPlayed(const UObject* EventData)
         // Set owner.
         UPDOwnerComponent* OwnerComponent = CardActor->FindComponentByClass<UPDOwnerComponent>();
         OwnerComponent->SetOwnerEntityId(CardPlayedEvent->OwnerEntityId);
+    }
+}
+
+void UPDCardActorManager::OnStarshipAssigned(const UObject* EventData)
+{
+    const UPDStarshipAssignedEvent* StarshipAssignedEvent = Cast<UPDStarshipAssignedEvent>(EventData);
+
+    APDCardActor* AssignedStarship = Cards.FindRef(StarshipAssignedEvent->AssignedStarship);
+    APDCardActor* AssignedTo = Cards.FindRef(StarshipAssignedEvent->AssignedTo);
+
+    if (IsValid(AssignedStarship) && IsValid(AssignedTo))
+    {
+        AssignedStarship->SetActorLocation(AssignedTo->GetActorLocation() + AssignedCardOffset);
     }
 }
 

@@ -59,6 +59,9 @@ private:
     UPROPERTY(EditDefaultsOnly)
     FVector EnemyShipsCardPadding;
 
+    UPROPERTY(EditDefaultsOnly)
+    FVector AssignedCardOffset;
+
     UPROPERTY()
     UPDEventManager* EventManager;
 
@@ -85,6 +88,9 @@ private:
 
     UFUNCTION()
     void OnCardPlayed(const UObject* EventData);
+
+    UFUNCTION()
+    void OnStarshipAssigned(const UObject* EventData);
 
     UFUNCTION()
     void OnBeginCursorOver(AActor* TouchedActor);

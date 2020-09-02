@@ -23,6 +23,9 @@ public:
     UFUNCTION(BlueprintCallable)
     void ServerEndMainPhase();
 
+    UFUNCTION(BlueprintCallable)
+    void ServerAssignStarship(int64 AssignedStarship, int64 AssignedTo);
+
 private:
     UPROPERTY()
     UPDUIMode* UIMode;
@@ -31,6 +34,9 @@ private:
 
     UFUNCTION()
     void OnPlayerEntityCreated(const UObject* EventData);
+
+    UFUNCTION()
+    void OnTurnPhaseStarted(const UObject* EventData);
 
     UFUNCTION()
     void OnCardClicked(APDCardActor* ClickedActor);
