@@ -5,6 +5,7 @@
 
 #include "PDPlayerController.generated.h"
 
+class UPDAction;
 class UPDEventManager;
 
 UCLASS()
@@ -18,9 +19,14 @@ public:
     UFUNCTION(BlueprintPure)
     bool IsLocalPlayer(int64 PlayerEntityId) const;
 
+    UFUNCTION(BlueprintCallable)
+    void ServerEndMainPhase();
+
 private:
     int64 LocalPlayerEntityId;
 
     UFUNCTION()
     void OnPlayerEntityCreated(const UObject* EventData);
+
+    void SendActionToServer(UPDAction* Action);
 };

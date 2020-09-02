@@ -6,7 +6,9 @@
 #include "Core/PDGameInstance.h"
 #include "Core/PDGameMode.h"
 #include "Core/PDLog.h"
+#include "Events/PDAction.h"
 #include "Events/PDEventManager.h"
+#include "Events/EventData/PDEndMainPhaseAction.h"
 #include "Events/EventData/PDPlayerEntityCreatedEvent.h"
 #include "Online/Auth/PDAuthService.h"
 
@@ -41,6 +43,12 @@ bool APDPlayerController::IsLocalPlayer(int64 PlayerEntityId) const
     return PlayerEntityId == LocalPlayerEntityId;
 }
 
+void APDPlayerController::ServerEndMainPhase()
+{
+    UPDEndMainPhaseAction* Action = NewObject<UPDEndMainPhaseAction>(this);
+    SendActionToServer(Action);
+}
+
 void APDPlayerController::OnPlayerEntityCreated(const UObject* EventData)
 {
     const UPDPlayerEntityCreatedEvent* PlayerEntityCreatedEvent = Cast<UPDPlayerEntityCreatedEvent>(EventData);
@@ -69,4 +77,16 @@ void APDPlayerController::OnPlayerEntityCreated(const UObject* EventData)
     LocalPlayerEntityId = PlayerEntityCreatedEvent->EntityId;
 
     UE_LOG(LogPD, Log, TEXT("Local player entity id is %i."), LocalPlayerEntityId);
+}
+
+void APDPlayerController::SendActionToServer(UPDAction* Action)
+{
+    APDGameMode* GameMode = Cast<APDGameMode>(UGameplayStatics::GetGameMode(this));
+
+    if (!IsValid(GameMode))
+    {
+        return;
+    }
+
+    GameMode->SendActionToServer(Action);
 }
