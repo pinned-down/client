@@ -49,6 +49,12 @@ private:
     UPROPERTY(EditDefaultsOnly)
     FVector PlayerShipsCardPadding;
 
+    UPROPERTY(EditDefaultsOnly)
+    FVector EnemyShipsStartLocation;
+
+    UPROPERTY(EditDefaultsOnly)
+    FVector EnemyShipsCardPadding;
+
     UPROPERTY()
     UPDEventManager* EventManager;
 
@@ -63,6 +69,9 @@ private:
 
     UPROPERTY()
     APDCardActor* CurrentLocationCard;
+
+    UPROPERTY()
+    TArray<APDCardActor*> EnemyCards;
 
     UFUNCTION()
     void OnPlayerHandChanged(const UObject* EventData);

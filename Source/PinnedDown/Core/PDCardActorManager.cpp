@@ -100,21 +100,33 @@ void UPDCardActorManager::OnCardPlayed(const UObject* EventData)
     APDPlayerController* PlayerController = Cast<APDPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
     bool bIsPlayerCard = IsValid(PlayerController) && PlayerController->IsLocalPlayer(CardPlayedEvent->OwnerEntityId);
 
-    if (!bIsPlayerCard)
+    // Calculate location.
+    FVector CardLocation;
+
+    if (bIsPlayerCard)
     {
-        // TODO(np): Show ally and enemy cards.
-        return;
+        CardLocation = PlayerShipsStartLocation + LocalPlayerCards.Num() * PlayerShipsCardPadding;
+    }
+    else
+    {
+        CardLocation = EnemyShipsStartLocation + EnemyCards.Num() * EnemyShipsCardPadding;
     }
 
     // Create card actor.
-    FVector CardPadding = LocalPlayerCards.Num() * PlayerShipsCardPadding;
-
-    APDCardActor* CardActor = GetWorld()->SpawnActor<APDCardActor>(CardActorClass, PlayerShipsStartLocation + CardPadding, FRotator::ZeroRotator);
+    APDCardActor* CardActor = GetWorld()->SpawnActor<APDCardActor>(CardActorClass, CardLocation, FRotator::ZeroRotator);
 
     if (IsValid(CardActor))
     {
         InitCardActor(CardActor, CardPlayedEvent->EntityId, CardPlayedEvent->BlueprintId);
-        LocalPlayerCards.Add(CardActor);
+
+        if (bIsPlayerCard)
+        {
+            LocalPlayerCards.Add(CardActor);
+        }
+        else
+        {
+            EnemyCards.Add(CardActor);
+        }
     }
 }
 
