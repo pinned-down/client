@@ -9,6 +9,7 @@
 #include "Data/PDCardMetadata.h"
 #include "Data/Components/PDDistanceComponent.h"
 #include "Data/Components/PDGameplayTagsComponent.h"
+#include "Data/Components/PDOwnerComponent.h"
 #include "Data/Components/PDPowerComponent.h"
 #include "Data/Components/PDStructureComponent.h"
 #include "Data/Components/PDThreatComponent.h"
@@ -19,6 +20,7 @@ APDCardActor::APDCardActor(const FObjectInitializer& ObjectInitializer /*= FObje
 {
     DistanceComponent = CreateDefaultSubobject<UPDDistanceComponent>(TEXT("DistanceComponent"));
     GameplayTagsComponent = CreateDefaultSubobject<UPDGameplayTagsComponent>(TEXT("GameplayTagsComponent"));
+    OwnerComponent = CreateDefaultSubobject<UPDOwnerComponent>(TEXT("OwnerComponent"));
     PowerComponent = CreateDefaultSubobject<UPDPowerComponent>(TEXT("PowerComponent"));
     StructureComponent = CreateDefaultSubobject<UPDStructureComponent>(TEXT("StructureComponent"));
     ThreatComponent = CreateDefaultSubobject<UPDThreatComponent>(TEXT("ThreatComponent"));
@@ -70,4 +72,9 @@ void APDCardActor::Init(int64 InEntityId, const FName& InCardId)
 
     // Notify listeners.
     OnCardInitialized(EntityId, CardId);
+}
+
+int64 APDCardActor::GetEntityId() const
+{
+    return EntityId;
 }

@@ -127,6 +127,10 @@ void UPDCardActorManager::OnCardPlayed(const UObject* EventData)
         {
             EnemyCards.Add(CardActor);
         }
+
+        // Set owner.
+        UPDOwnerComponent* OwnerComponent = CardActor->FindComponentByClass<UPDOwnerComponent>();
+        OwnerComponent->SetOwnerEntityId(CardPlayedEvent->OwnerEntityId);
     }
 }
 

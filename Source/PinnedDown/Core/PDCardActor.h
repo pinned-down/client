@@ -8,6 +8,7 @@
 
 class UPDDistanceComponent;
 class UPDGameplayTagsComponent;
+class UPDOwnerComponent;
 class UPDPowerComponent;
 class UPDStructureComponent;
 class UPDThreatComponent;
@@ -27,6 +28,8 @@ public:
     UFUNCTION(BlueprintImplementableEvent)
     void OnCardInitialized(int64 InEntityId, const FName& InCardId);
 
+    int64 GetEntityId() const;
+
 private:
     UPROPERTY(VisibleAnywhere)
     int64 EntityId;
@@ -39,6 +42,9 @@ private:
 
     UPROPERTY(VisibleAnywhere)
     UPDGameplayTagsComponent* GameplayTagsComponent;
+
+    UPROPERTY(VisibleAnywhere)
+    UPDOwnerComponent* OwnerComponent;
 
     UPROPERTY(VisibleAnywhere)
     UPDPowerComponent* PowerComponent;
