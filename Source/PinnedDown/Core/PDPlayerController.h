@@ -26,6 +26,9 @@ public:
     UFUNCTION(BlueprintCallable)
     void ServerAssignStarship(int64 AssignedStarship, int64 AssignedTo);
 
+    UFUNCTION(BlueprintCallable)
+    void ServerEndAssignmentPhase();
+
 private:
     UPROPERTY()
     UPDUIMode* UIMode;

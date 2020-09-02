@@ -10,6 +10,7 @@
 #include "Events/PDAction.h"
 #include "Events/PDEventManager.h"
 #include "Events/EventData/PDAssignStarshipAction.h"
+#include "Events/EventData/PDEndAssignmentPhaseAction.h"
 #include "Events/EventData/PDEndMainPhaseAction.h"
 #include "Events/EventData/PDPlayerEntityCreatedEvent.h"
 #include "Events/EventData/PDTurnPhaseStartedEvent.h"
@@ -69,6 +70,12 @@ void APDPlayerController::ServerAssignStarship(int64 AssignedStarship, int64 Ass
     UPDAssignStarshipAction* Action = NewObject<UPDAssignStarshipAction>(this);
     Action->AssignedStarship = AssignedStarship;
     Action->AssignedTo = AssignedTo;
+    SendActionToServer(Action);
+}
+
+void APDPlayerController::ServerEndAssignmentPhase()
+{
+    UPDEndAssignmentPhaseAction* Action = NewObject<UPDEndAssignmentPhaseAction>(this);
     SendActionToServer(Action);
 }
 
