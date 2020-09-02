@@ -13,6 +13,7 @@ class UPDEventManager;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerCardHoveredSignature, APDCardActor*, HoveredActor);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerCardUnhoveredSignature, APDCardActor*, UnhoveredActor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerCardClickedSignature, APDCardActor*, ClickedActor);
 
 UCLASS(BlueprintType, Blueprintable)
 class PINNEDDOWN_API UPDCardActorManager : public UObject
@@ -29,6 +30,9 @@ public:
 
     UPROPERTY(BlueprintAssignable)
     FPDCardActorManagerCardUnhoveredSignature OnCardUnhovered;
+
+    UPROPERTY(BlueprintAssignable)
+    FPDCardActorManagerCardClickedSignature OnCardClicked;
 
 private:
     UPROPERTY(EditDefaultsOnly)
@@ -54,6 +58,9 @@ private:
 
     UPROPERTY(EditDefaultsOnly)
     FVector EnemyShipsCardPadding;
+
+    UPROPERTY(EditDefaultsOnly)
+    FVector AssignedCardOffset;
 
     UPROPERTY()
     UPDEventManager* EventManager;
@@ -83,10 +90,16 @@ private:
     void OnCardPlayed(const UObject* EventData);
 
     UFUNCTION()
+    void OnStarshipAssigned(const UObject* EventData);
+
+    UFUNCTION()
     void OnBeginCursorOver(AActor* TouchedActor);
 
     UFUNCTION()
     void OnEndCursorOver(AActor* TouchedActor);
+
+    UFUNCTION()
+    void OnClicked(AActor* TouchedActor, FKey ButtonPressed);
 
     void InitCardActor(APDCardActor* CardActor, int64 EntityId, const FString& CardId);
 };

@@ -7,6 +7,7 @@
 
 class UPDAction;
 class UPDEventManager;
+class UPDUIMode;
 
 UCLASS()
 class PINNEDDOWN_API APDPlayerController : public APlayerController
@@ -22,11 +23,24 @@ public:
     UFUNCTION(BlueprintCallable)
     void ServerEndMainPhase();
 
+    UFUNCTION(BlueprintCallable)
+    void ServerAssignStarship(int64 AssignedStarship, int64 AssignedTo);
+
 private:
+    UPROPERTY()
+    UPDUIMode* UIMode;
+
     int64 LocalPlayerEntityId;
 
     UFUNCTION()
     void OnPlayerEntityCreated(const UObject* EventData);
 
+    UFUNCTION()
+    void OnTurnPhaseStarted(const UObject* EventData);
+
+    UFUNCTION()
+    void OnCardClicked(APDCardActor* ClickedActor);
+
     void SendActionToServer(UPDAction* Action);
+    void SetUIMode(UPDUIMode* NewUIMode);
 };

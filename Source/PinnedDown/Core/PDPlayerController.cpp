@@ -2,15 +2,20 @@
 
 #include "Kismet/GameplayStatics.h"
 
+#include "Core/PDCardActorManager.h"
 #include "Core/PDDelegate.h"
 #include "Core/PDGameInstance.h"
 #include "Core/PDGameMode.h"
 #include "Core/PDLog.h"
 #include "Events/PDAction.h"
 #include "Events/PDEventManager.h"
+#include "Events/EventData/PDAssignStarshipAction.h"
 #include "Events/EventData/PDEndMainPhaseAction.h"
 #include "Events/EventData/PDPlayerEntityCreatedEvent.h"
+#include "Events/EventData/PDTurnPhaseStartedEvent.h"
 #include "Online/Auth/PDAuthService.h"
+#include "UI/PDUIMode.h"
+#include "UI/PDUIModeAssignmentPhase.h"
 
 void APDPlayerController::BeginPlay()
 {
@@ -36,6 +41,16 @@ void APDPlayerController::BeginPlay()
 
     PDCreateDynamicDelegate(FPDEventListenerSignature, OnPlayerEntityCreated, &APDPlayerController::OnPlayerEntityCreated);
     EventManager->AddListener(TEXT("PDPlayerEntityCreatedEvent"), OnPlayerEntityCreated);
+
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnTurnPhaseStarted, &APDPlayerController::OnTurnPhaseStarted);
+    EventManager->AddListener(TEXT("PDTurnPhaseStartedEvent"), OnTurnPhaseStarted);
+
+    UPDCardActorManager* CardActorManager = GameMode->GetCardActorManager();
+
+    if (IsValid(CardActorManager))
+    {
+        CardActorManager->OnCardClicked.AddDynamic(this, &APDPlayerController::OnCardClicked);
+    }
 }
 
 bool APDPlayerController::IsLocalPlayer(int64 PlayerEntityId) const
@@ -46,6 +61,14 @@ bool APDPlayerController::IsLocalPlayer(int64 PlayerEntityId) const
 void APDPlayerController::ServerEndMainPhase()
 {
     UPDEndMainPhaseAction* Action = NewObject<UPDEndMainPhaseAction>(this);
+    SendActionToServer(Action);
+}
+
+void APDPlayerController::ServerAssignStarship(int64 AssignedStarship, int64 AssignedTo)
+{
+    UPDAssignStarshipAction* Action = NewObject<UPDAssignStarshipAction>(this);
+    Action->AssignedStarship = AssignedStarship;
+    Action->AssignedTo = AssignedTo;
     SendActionToServer(Action);
 }
 
@@ -79,6 +102,28 @@ void APDPlayerController::OnPlayerEntityCreated(const UObject* EventData)
     UE_LOG(LogPD, Log, TEXT("Local player entity id is %i."), LocalPlayerEntityId);
 }
 
+void APDPlayerController::OnTurnPhaseStarted(const UObject* EventData)
+{
+    const UPDTurnPhaseStartedEvent* TurnPhasedStartedEvent = Cast<UPDTurnPhaseStartedEvent>(EventData);
+
+    if (TurnPhasedStartedEvent->GetTurnPhase() == EPDTurnPhase::TURNPHASE_Assignment)
+    {
+        SetUIMode(NewObject<UPDUIModeAssignmentPhase>(this));
+    }
+    else if (TurnPhasedStartedEvent->GetTurnPhase() == EPDTurnPhase::TURNPHASE_Fight)
+    {
+        SetUIMode(nullptr);
+    }
+}
+
+void APDPlayerController::OnCardClicked(APDCardActor* ClickedActor)
+{
+    if (IsValid(UIMode))
+    {
+        UIMode->HandleCardClicked(ClickedActor);
+    }
+}
+
 void APDPlayerController::SendActionToServer(UPDAction* Action)
 {
     APDGameMode* GameMode = Cast<APDGameMode>(UGameplayStatics::GetGameMode(this));
@@ -89,4 +134,10 @@ void APDPlayerController::SendActionToServer(UPDAction* Action)
     }
 
     GameMode->SendActionToServer(Action);
+}
+
+void APDPlayerController::SetUIMode(UPDUIMode* NewUIMode)
+{
+    UIMode = NewUIMode;
+    UIMode->Init(this);
 }
