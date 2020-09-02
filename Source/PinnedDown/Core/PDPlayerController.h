@@ -7,6 +7,7 @@
 
 class UPDAction;
 class UPDEventManager;
+class UPDUIMode;
 
 UCLASS()
 class PINNEDDOWN_API APDPlayerController : public APlayerController
@@ -23,10 +24,17 @@ public:
     void ServerEndMainPhase();
 
 private:
+    UPROPERTY()
+    UPDUIMode* UIMode;
+
     int64 LocalPlayerEntityId;
 
     UFUNCTION()
     void OnPlayerEntityCreated(const UObject* EventData);
 
+    UFUNCTION()
+    void OnCardClicked(APDCardActor* ClickedActor);
+
     void SendActionToServer(UPDAction* Action);
+    void SetUIMode(UPDUIMode* NewUIMode);
 };
