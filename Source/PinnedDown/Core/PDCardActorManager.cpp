@@ -5,6 +5,7 @@
 #include "Core/PDCardActor.h"
 #include "Core/PDDelegate.h"
 #include "Core/PDPlayerController.h"
+#include "Data/Components/PDAssignmentComponent.h"
 #include "Data/Components/PDOwnerComponent.h"
 #include "Events/PDEventManager.h"
 #include "Events/EventData/PDCardPlayedEvent.h"
@@ -146,9 +147,29 @@ void UPDCardActorManager::OnStarshipAssigned(const UObject* EventData)
     APDCardActor* AssignedStarship = Cards.FindRef(StarshipAssignedEvent->AssignedStarship);
     APDCardActor* AssignedTo = Cards.FindRef(StarshipAssignedEvent->AssignedTo);
 
-    if (IsValid(AssignedStarship) && IsValid(AssignedTo))
+    if (!IsValid(AssignedStarship))
     {
-        AssignedStarship->SetActorLocation(AssignedTo->GetActorLocation() + AssignedCardOffset);
+        return;
+    }
+
+    // Store assignment.
+    UPDAssignmentComponent* AssignmentComponent = AssignedStarship->FindComponentByClass<UPDAssignmentComponent>();
+
+    if (IsValid(AssignmentComponent))
+    {
+        AssignmentComponent->SetAssignedTo(AssignedTo);
+    }
+
+    // Update actor location.
+    if (IsValid(AssignedTo))
+    {
+        FVector NewLocation = AssignedTo->GetActorLocation() + AssignedCardOffset;
+        AssignedStarship->SetActorLocation(NewLocation);
+    }
+    else
+    {
+        FVector NewLocation = PlayerShipsStartLocation + LocalPlayerCards.IndexOfByKey(AssignedStarship) * PlayerShipsCardPadding;
+        AssignedStarship->SetActorLocation(NewLocation);
     }
 }
 

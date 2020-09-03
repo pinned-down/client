@@ -7,6 +7,7 @@
 #include "Core/PDGameInstance.h"
 #include "Data/PDCardSet.h"
 #include "Data/PDCardMetadata.h"
+#include "Data/Components/PDAssignmentComponent.h"
 #include "Data/Components/PDDistanceComponent.h"
 #include "Data/Components/PDGameplayTagsComponent.h"
 #include "Data/Components/PDOwnerComponent.h"
@@ -18,6 +19,7 @@
 APDCardActor::APDCardActor(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
     : Super(ObjectInitializer)
 {
+    AssignmentComponent = CreateDefaultSubobject<UPDAssignmentComponent>(TEXT("AssignmentComponent"));
     DistanceComponent = CreateDefaultSubobject<UPDDistanceComponent>(TEXT("DistanceComponent"));
     GameplayTagsComponent = CreateDefaultSubobject<UPDGameplayTagsComponent>(TEXT("GameplayTagsComponent"));
     OwnerComponent = CreateDefaultSubobject<UPDOwnerComponent>(TEXT("OwnerComponent"));

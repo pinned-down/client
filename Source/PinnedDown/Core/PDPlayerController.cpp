@@ -13,10 +13,12 @@
 #include "Events/EventData/PDEndAssignmentPhaseAction.h"
 #include "Events/EventData/PDEndMainPhaseAction.h"
 #include "Events/EventData/PDPlayerEntityCreatedEvent.h"
+#include "Events/EventData/PDResolveFightAction.h"
 #include "Events/EventData/PDTurnPhaseStartedEvent.h"
 #include "Online/Auth/PDAuthService.h"
 #include "UI/PDUIMode.h"
 #include "UI/PDUIModeAssignmentPhase.h"
+#include "UI/PDUIModeFightPhase.h"
 
 void APDPlayerController::BeginPlay()
 {
@@ -79,6 +81,13 @@ void APDPlayerController::ServerEndAssignmentPhase()
     SendActionToServer(Action);
 }
 
+void APDPlayerController::ServerResolveFight(int64 EntityId)
+{
+    UPDResolveFightAction* Action = NewObject<UPDResolveFightAction>(this);
+    Action->EntityId = EntityId;
+    SendActionToServer(Action);
+}
+
 void APDPlayerController::OnPlayerEntityCreated(const UObject* EventData)
 {
     const UPDPlayerEntityCreatedEvent* PlayerEntityCreatedEvent = Cast<UPDPlayerEntityCreatedEvent>(EventData);
@@ -118,6 +127,10 @@ void APDPlayerController::OnTurnPhaseStarted(const UObject* EventData)
         SetUIMode(NewObject<UPDUIModeAssignmentPhase>(this));
     }
     else if (TurnPhasedStartedEvent->GetTurnPhase() == EPDTurnPhase::TURNPHASE_Fight)
+    {
+        SetUIMode(NewObject<UPDUIModeFightPhase>(this));
+    }
+    else if (TurnPhasedStartedEvent->GetTurnPhase() == EPDTurnPhase::TURNPHASE_Jump)
     {
         SetUIMode(nullptr);
     }

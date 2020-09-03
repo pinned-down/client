@@ -29,6 +29,9 @@ public:
     UFUNCTION(BlueprintCallable)
     void ServerEndAssignmentPhase();
 
+    UFUNCTION(BlueprintCallable)
+    void ServerResolveFight(int64 EntityId);
+
 private:
     UPROPERTY()
     UPDUIMode* UIMode;

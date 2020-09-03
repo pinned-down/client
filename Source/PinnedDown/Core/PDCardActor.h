@@ -6,6 +6,7 @@
 
 #include "PDCardActor.generated.h"
 
+class UPDAssignmentComponent;
 class UPDDistanceComponent;
 class UPDGameplayTagsComponent;
 class UPDOwnerComponent;
@@ -36,6 +37,9 @@ private:
 
     UPROPERTY(VisibleAnywhere)
     FName CardId;
+
+    UPROPERTY(VisibleAnywhere)
+    UPDAssignmentComponent* AssignmentComponent;
 
     UPROPERTY(VisibleAnywhere)
     UPDDistanceComponent* DistanceComponent;
