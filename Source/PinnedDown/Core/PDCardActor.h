@@ -7,6 +7,7 @@
 #include "PDCardActor.generated.h"
 
 class UPDAssignmentComponent;
+class UPDAttachmentComponent;
 class UPDDistanceComponent;
 class UPDGameplayTagsComponent;
 class UPDOwnerComponent;
@@ -40,6 +41,9 @@ private:
 
     UPROPERTY(VisibleAnywhere)
     UPDAssignmentComponent* AssignmentComponent;
+
+    UPROPERTY(VisibleAnywhere)
+    UPDAttachmentComponent* AttachmentComponent;
 
     UPROPERTY(VisibleAnywhere)
     UPDDistanceComponent* DistanceComponent;

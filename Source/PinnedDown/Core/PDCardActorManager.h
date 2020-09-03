@@ -62,6 +62,9 @@ private:
     UPROPERTY(EditDefaultsOnly)
     FVector AssignedCardOffset;
 
+    UPROPERTY(EditDefaultsOnly)
+    FVector AttachedCardOffset;
+
     UPROPERTY()
     UPDEventManager* EventManager;
 
@@ -80,6 +83,9 @@ private:
     UPROPERTY()
     TArray<APDCardActor*> EnemyCards;
 
+    UPROPERTY()
+    TArray<APDCardActor*> DamageCards;
+
     UFUNCTION()
     void OnPlayerHandChanged(const UObject* EventData);
 
@@ -91,6 +97,9 @@ private:
 
     UFUNCTION()
     void OnStarshipAssigned(const UObject* EventData);
+
+    UFUNCTION()
+    void OnStarshipDamaged(const UObject* EventData);
 
     UFUNCTION()
     void OnBeginCursorOver(AActor* TouchedActor);

@@ -6,12 +6,14 @@
 #include "Core/PDDelegate.h"
 #include "Core/PDPlayerController.h"
 #include "Data/Components/PDAssignmentComponent.h"
+#include "Data/Components/PDAttachmentComponent.h"
 #include "Data/Components/PDOwnerComponent.h"
 #include "Events/PDEventManager.h"
 #include "Events/EventData/PDCardPlayedEvent.h"
 #include "Events/EventData/PDCurrentLocationChangedEvent.h"
 #include "Events/EventData/PDPlayerHandChangedEvent.h"
 #include "Events/EventData/PDStarshipAssignedEvent.h"
+#include "Events/EventData/PDStarshipDamagedEvent.h"
 
 UPDCardActorManager::UPDCardActorManager(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
     : Super(ObjectInitializer)
@@ -35,6 +37,9 @@ void UPDCardActorManager::Init(UPDEventManager* InEventManager)
 
     PDCreateDynamicDelegate(FPDEventListenerSignature, OnStarshipAssigned, &UPDCardActorManager::OnStarshipAssigned);
     EventManager->AddListener(TEXT("PDStarshipAssignedEvent"), OnStarshipAssigned);
+
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnStarshipDamaged, &UPDCardActorManager::OnStarshipDamaged);
+    EventManager->AddListener(TEXT("PDStarshipDamagedEvent"), OnStarshipDamaged);
 }
 
 void UPDCardActorManager::OnPlayerHandChanged(const UObject* EventData)
@@ -170,6 +175,45 @@ void UPDCardActorManager::OnStarshipAssigned(const UObject* EventData)
     {
         FVector NewLocation = PlayerShipsStartLocation + LocalPlayerCards.IndexOfByKey(AssignedStarship) * PlayerShipsCardPadding;
         AssignedStarship->SetActorLocation(NewLocation);
+    }
+}
+
+void UPDCardActorManager::OnStarshipDamaged(const UObject* EventData)
+{
+    const UPDStarshipDamagedEvent* StarshipDamagedEvent = Cast<UPDStarshipDamagedEvent>(EventData);
+
+    APDCardActor* AttachedTo = Cards.FindRef(StarshipDamagedEvent->StarshipEntityId);
+
+    // Calculate actor location.
+    int32 NumDamageCards = 1;
+
+    for (APDCardActor* DamageCard : DamageCards)
+    {
+        UPDAttachmentComponent* OtherAttachmentComponent = DamageCard->FindComponentByClass<UPDAttachmentComponent>();
+
+        if (IsValid(OtherAttachmentComponent) && OtherAttachmentComponent->GetAttachedTo() == AttachedTo)
+        {
+            ++NumDamageCards;
+        }
+    }
+
+    FVector CardLocation = AttachedTo->GetActorLocation() + AttachedCardOffset * NumDamageCards;
+
+    // Create card actor.
+    APDCardActor* CardActor = GetWorld()->SpawnActor<APDCardActor>(CardActorClass, CardLocation, FRotator::ZeroRotator);
+
+    if (IsValid(CardActor))
+    {
+        InitCardActor(CardActor, StarshipDamagedEvent->DamageEntityId, StarshipDamagedEvent->DamageBlueprintId);
+        DamageCards.Add(CardActor);
+
+        // Store attachment.
+        UPDAttachmentComponent* AttachmentComponent = CardActor->FindComponentByClass<UPDAttachmentComponent>();
+
+        if (IsValid(AttachmentComponent))
+        {
+            AttachmentComponent->SetAttachedTo(AttachedTo);
+        }
     }
 }
 
