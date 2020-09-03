@@ -102,6 +102,9 @@ private:
     void OnStarshipDamaged(const UObject* EventData);
 
     UFUNCTION()
+    void OnCardRemoved(const UObject* EventData);
+
+    UFUNCTION()
     void OnBeginCursorOver(AActor* TouchedActor);
 
     UFUNCTION()

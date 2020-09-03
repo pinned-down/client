@@ -10,6 +10,7 @@
 #include "Data/Components/PDOwnerComponent.h"
 #include "Events/PDEventManager.h"
 #include "Events/EventData/PDCardPlayedEvent.h"
+#include "Events/EventData/PDCardRemovedEvent.h"
 #include "Events/EventData/PDCurrentLocationChangedEvent.h"
 #include "Events/EventData/PDPlayerHandChangedEvent.h"
 #include "Events/EventData/PDStarshipAssignedEvent.h"
@@ -40,6 +41,9 @@ void UPDCardActorManager::Init(UPDEventManager* InEventManager)
 
     PDCreateDynamicDelegate(FPDEventListenerSignature, OnStarshipDamaged, &UPDCardActorManager::OnStarshipDamaged);
     EventManager->AddListener(TEXT("PDStarshipDamagedEvent"), OnStarshipDamaged);
+
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnCardRemoved, &UPDCardActorManager::OnCardRemoved);
+    EventManager->AddListener(TEXT("PDCardRemovedEvent"), OnCardRemoved);
 }
 
 void UPDCardActorManager::OnPlayerHandChanged(const UObject* EventData)
@@ -214,6 +218,24 @@ void UPDCardActorManager::OnStarshipDamaged(const UObject* EventData)
         {
             AttachmentComponent->SetAttachedTo(AttachedTo);
         }
+    }
+}
+
+void UPDCardActorManager::OnCardRemoved(const UObject* EventData)
+{
+    const UPDCardRemovedEvent* CardRemovedEvent = Cast<UPDCardRemovedEvent>(EventData);
+    APDCardActor* RemovedCard = Cards.FindRef(CardRemovedEvent->EntityId);
+
+    if (IsValid(RemovedCard))
+    {
+        Cards.Remove(RemovedCard->GetEntityId());
+
+        HandCards.Remove(RemovedCard);
+        LocalPlayerCards.Remove(RemovedCard);
+        EnemyCards.Remove(RemovedCard);
+        DamageCards.Remove(RemovedCard);
+
+        RemovedCard->Destroy();
     }
 }
 
