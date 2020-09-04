@@ -216,6 +216,8 @@ void UPDCardActorManager::OnStarshipDamaged(const UObject* EventData)
         InitCardActor(CardActor, StarshipDamagedEvent->DamageEntityId, StarshipDamagedEvent->DamageBlueprintId);
         DamageCards.Add(CardActor);
 
+        CardActor->AttachToActor(AttachedTo, FAttachmentTransformRules::KeepWorldTransform);
+
         // Store attachment.
         UPDAttachmentComponent* AttachmentComponent = CardActor->FindComponentByClass<UPDAttachmentComponent>();
 
