@@ -46,6 +46,11 @@ void UPDCardActorManager::Init(UPDEventManager* InEventManager)
     EventManager->AddListener(TEXT("PDCardRemovedEvent"), OnCardRemoved);
 }
 
+APDCardActor* UPDCardActorManager::GetCardActor(int64 EntityId) const
+{
+    return Cards.FindRef(EntityId);
+}
+
 void UPDCardActorManager::OnPlayerHandChanged(const UObject* EventData)
 {
     const UPDPlayerHandChangedEvent* PlayerHandChangedEvent = Cast<UPDPlayerHandChangedEvent>(EventData);

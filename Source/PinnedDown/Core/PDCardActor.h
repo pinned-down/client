@@ -30,7 +30,11 @@ public:
     UFUNCTION(BlueprintImplementableEvent)
     void OnCardInitialized(int64 InEntityId, const FName& InCardId);
 
+    UFUNCTION(BlueprintPure)
     int64 GetEntityId() const;
+
+    UFUNCTION(BlueprintPure)
+    FName GetCardId() const;
 
 private:
     UPROPERTY(VisibleAnywhere)

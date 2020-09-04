@@ -25,6 +25,9 @@ public:
 
     void Init(UPDEventManager* InEventManager);
 
+    UFUNCTION(BlueprintPure)
+    APDCardActor* GetCardActor(int64 EntityId) const;
+
     UPROPERTY(BlueprintAssignable)
     FPDCardActorManagerCardHoveredSignature OnCardHovered;
 

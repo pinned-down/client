@@ -82,3 +82,8 @@ int64 APDCardActor::GetEntityId() const
 {
     return EntityId;
 }
+
+FName APDCardActor::GetCardId() const
+{
+    return CardId;
+}
