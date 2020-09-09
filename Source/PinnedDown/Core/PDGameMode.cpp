@@ -9,6 +9,7 @@
 #include "Events/PDAction.h"
 #include "Events/PDEventManager.h"
 #include "Events/EventData/PDJoinGameAction.h"
+#include "Events/EventData/PDLeaveGameAction.h"
 #include "Online/Auth/PDAuthService.h"
 
 APDGameMode::APDGameMode(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -36,7 +37,7 @@ void APDGameMode::InitGame(const FString& MapName, const FString& Options, FStri
         return;
     }
 
-    FString WebSocketUrl = TEXT("ws://") + ServerEndpoint + TEXT("/pinned-down");
+    WebSocketUrl = TEXT("ws://") + ServerEndpoint + TEXT("/pinned-down");
 
     FStompModule& StompModule = FStompModule::Get();
     StompClient = StompModule.CreateClient(WebSocketUrl);
@@ -44,8 +45,29 @@ void APDGameMode::InitGame(const FString& MapName, const FString& Options, FStri
     StompClient->OnConnected().AddUObject(this, &APDGameMode::OnConnected);
     StompClient->OnConnectionError().AddUObject(this, &APDGameMode::OnConnectionError);
     StompClient->OnError().AddUObject(this, &APDGameMode::OnError);
+    StompClient->OnClosed().AddUObject(this, &APDGameMode::OnClosed);
 
     StompClient->Connect();
+}
+
+void APDGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    Super::EndPlay(EndPlayReason);
+
+    if (StompClient != nullptr)
+    {
+        UE_LOG(LogPD, Log, TEXT("Disconnecting from %s ..."), *WebSocketUrl);
+
+        // Send leave message.
+        UPDGameInstance* GameInstance = GetGameInstance<UPDGameInstance>();
+        UPDAuthService* AuthService = GameInstance->GetAuthService();
+        UPDLeaveGameAction* LeaveAction = NewObject<UPDLeaveGameAction>(this);
+        LeaveAction->PlayerId = AuthService->GetPlayerId();
+
+        SendActionToServer(LeaveAction);
+
+        StompClient->Disconnect();
+    }
 }
 
 void APDGameMode::SendActionToServer(UPDAction* Action)
@@ -153,4 +175,9 @@ void APDGameMode::OnError(const FString& Error)
 {
     // TODO(np): Set error message and return to main menu.
     UE_LOG(LogPD, Error, TEXT("APDGameMode::OnError - %s"), *Error);
+}
+
+void APDGameMode::OnClosed(const FString& Reason)
+{
+    UE_LOG(LogPD, Log, TEXT("APDGameMode::OnClosed - %s"), *Reason);
 }

@@ -22,6 +22,7 @@ public:
     APDGameMode(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
     virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
     void SendActionToServer(UPDAction* Action);
 
@@ -35,6 +36,7 @@ private:
     UPROPERTY(EditDefaultsOnly)
     TSubclassOf<UPDCardActorManager> CardActorManagerClass;
 
+    FString WebSocketUrl;
     TSharedPtr<IStompClient> StompClient;
 
     UPROPERTY()
@@ -48,4 +50,5 @@ private:
 
     void OnMessage(const IStompMessage& Message);
     void OnError(const FString& Error);
+    void OnClosed(const FString& Reason);
 };
