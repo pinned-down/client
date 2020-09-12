@@ -13,6 +13,7 @@
 #include "Events/EventData/PDEndAssignmentPhaseAction.h"
 #include "Events/EventData/PDEndMainPhaseAction.h"
 #include "Events/EventData/PDPlayerEntityCreatedEvent.h"
+#include "Events/EventData/PDPlayEffectAction.h"
 #include "Events/EventData/PDResolveFightAction.h"
 #include "Events/EventData/PDTurnPhaseStartedEvent.h"
 #include "Online/Auth/PDAuthService.h"
@@ -85,6 +86,14 @@ void APDPlayerController::ServerResolveFight(int64 EntityId)
 {
     UPDResolveFightAction* Action = NewObject<UPDResolveFightAction>(this);
     Action->EntityId = EntityId;
+    SendActionToServer(Action);
+}
+
+void APDPlayerController::ServerPlayEffect(const FString& EffectCardId, int64 TargetEntityId)
+{
+    UPDPlayEffectAction* Action = NewObject<UPDPlayEffectAction>(this);
+    Action->BlueprintId = EffectCardId;
+    Action->TargetEntityId = TargetEntityId;
     SendActionToServer(Action);
 }
 

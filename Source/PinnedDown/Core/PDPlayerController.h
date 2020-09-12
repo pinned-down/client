@@ -32,6 +32,9 @@ public:
     UFUNCTION(BlueprintCallable)
     void ServerResolveFight(int64 EntityId);
 
+    UFUNCTION(BlueprintCallable)
+    void ServerPlayEffect(const FString& EffectCardId, int64 TargetEntityId);
+
 private:
     UPROPERTY()
     UPDUIMode* UIMode;

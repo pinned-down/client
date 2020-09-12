@@ -15,4 +15,11 @@ class PINNEDDOWN_API UPDUIModeFightPhase : public UPDUIMode
 
 public:
     virtual void HandleCardClicked(APDCardActor* ClickedActor);
+
+private:
+    UPROPERTY()
+    APDCardActor* EffectToPickTargetFor;
+
+    void HandleStarshipClicked(APDCardActor* ClickedActor);
+    void HandleEffectClicked(APDCardActor* ClickedActor);
 };

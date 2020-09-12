@@ -1,5 +1,10 @@
 #include "PDGameplayTagsComponent.h"
 
+TArray<FString> UPDGameplayTagsComponent::GetInitialGameplayTags() const
+{
+    return InitialGameplayTags;
+}
+
 EPDCardType UPDGameplayTagsComponent::GetCardType() const
 {
     for (const FString& TagName : InitialGameplayTags)

@@ -16,6 +16,9 @@ class PINNEDDOWN_API UPDGameplayTagsComponent : public UActorComponent
 
 public:
     UFUNCTION(BlueprintPure)
+    TArray<FString> GetInitialGameplayTags() const;
+
+    UFUNCTION(BlueprintPure)
     EPDCardType GetCardType() const;
 
     UFUNCTION(BlueprintPure)
