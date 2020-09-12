@@ -8,6 +8,7 @@
 #include "Data/Components/PDAssignmentComponent.h"
 #include "Data/Components/PDAttachmentComponent.h"
 #include "Data/Components/PDOwnerComponent.h"
+#include "Data/Components/PDPowerComponent.h"
 #include "Events/PDEventManager.h"
 #include "Events/EventData/PDCardPlayedEvent.h"
 #include "Events/EventData/PDCardRemovedEvent.h"
@@ -15,6 +16,7 @@
 #include "Events/EventData/PDPlayerHandChangedEvent.h"
 #include "Events/EventData/PDStarshipAssignedEvent.h"
 #include "Events/EventData/PDStarshipDamagedEvent.h"
+#include "Events/EventData/PDStarshipPowerChangedEvent.h"
 
 UPDCardActorManager::UPDCardActorManager(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
     : Super(ObjectInitializer)
@@ -44,6 +46,9 @@ void UPDCardActorManager::Init(UPDEventManager* InEventManager)
 
     PDCreateDynamicDelegate(FPDEventListenerSignature, OnCardRemoved, &UPDCardActorManager::OnCardRemoved);
     EventManager->AddListener(TEXT("PDCardRemovedEvent"), OnCardRemoved);
+
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnStarshipPowerChanged, &UPDCardActorManager::OnStarshipPowerChanged);
+    EventManager->AddListener(TEXT("PDStarshipPowerChangedEvent"), OnStarshipPowerChanged);
 }
 
 APDCardActor* UPDCardActorManager::GetCardActor(int64 EntityId) const
@@ -244,6 +249,26 @@ void UPDCardActorManager::OnCardRemoved(const UObject* EventData)
 
         RemovedCard->Destroy();
     }
+}
+
+void UPDCardActorManager::OnStarshipPowerChanged(const UObject* EventData)
+{
+    const UPDStarshipPowerChangedEvent* StarshipPowerChangedEvent = Cast<UPDStarshipPowerChangedEvent>(EventData);
+    APDCardActor* Card = Cards.FindRef(StarshipPowerChangedEvent->EntityId);
+
+    if (!IsValid(Card))
+    {
+        return;
+    }
+
+    UPDPowerComponent* PowerComponent = Card->FindComponentByClass<UPDPowerComponent>();
+
+    if (!IsValid(PowerComponent))
+    {
+        return;
+    }
+
+    PowerComponent->SetPowerModifier(StarshipPowerChangedEvent->NewPowerModifier);
 }
 
 void UPDCardActorManager::OnBeginCursorOver(AActor* TouchedActor)

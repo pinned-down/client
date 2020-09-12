@@ -6,6 +6,8 @@
 
 #include "PDPowerComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FPDPowerComponentPowerChangedSignature, AActor*, Actor, int32, OldPowerModifier, int32, NewPowerModifier);
+
 UCLASS(BlueprintType)
 class PINNEDDOWN_API UPDPowerComponent : public UActorComponent
 {
@@ -17,6 +19,11 @@ public:
 
     UFUNCTION(BlueprintPure)
     int32 GetPowerModifier() const;
+
+    void SetPowerModifier(int32 InPowerModifier);
+
+    UPROPERTY(BlueprintAssignable)
+    FPDPowerComponentPowerChangedSignature OnPowerChanged;
 
 private:
     UPROPERTY(VisibleAnywhere)
