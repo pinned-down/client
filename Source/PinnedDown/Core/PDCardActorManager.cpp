@@ -5,14 +5,15 @@
 #include "Core/PDCardActor.h"
 #include "Core/PDDelegate.h"
 #include "Core/PDPlayerController.h"
+#include "Data/PDCardType.h"
 #include "Data/Components/PDAssignmentComponent.h"
 #include "Data/Components/PDAttachmentComponent.h"
+#include "Data/Components/PDGameplayTagsComponent.h"
 #include "Data/Components/PDOwnerComponent.h"
 #include "Data/Components/PDPowerComponent.h"
 #include "Events/PDEventManager.h"
 #include "Events/EventData/PDCardPlayedEvent.h"
 #include "Events/EventData/PDCardRemovedEvent.h"
-#include "Events/EventData/PDCurrentLocationChangedEvent.h"
 #include "Events/EventData/PDPlayerHandChangedEvent.h"
 #include "Events/EventData/PDStarshipAssignedEvent.h"
 #include "Events/EventData/PDStarshipDamagedEvent.h"
@@ -31,9 +32,6 @@ void UPDCardActorManager::Init(UPDEventManager* InEventManager)
     // Register for events.
     PDCreateDynamicDelegate(FPDEventListenerSignature, OnPlayerHandChanged, &UPDCardActorManager::OnPlayerHandChanged);
     EventManager->AddListener(TEXT("PDPlayerHandChangedEvent"), OnPlayerHandChanged);
-
-    PDCreateDynamicDelegate(FPDEventListenerSignature, OnCurrentLocationChanged, &UPDCardActorManager::OnCurrentLocationChanged);
-    EventManager->AddListener(TEXT("PDCurrentLocationChangedEvent"), OnCurrentLocationChanged);
 
     PDCreateDynamicDelegate(FPDEventListenerSignature, OnCardPlayed, &UPDCardActorManager::OnCardPlayed);
     EventManager->AddListener(TEXT("PDCardPlayedEvent"), OnCardPlayed);
@@ -98,65 +96,55 @@ void UPDCardActorManager::OnPlayerHandChanged(const UObject* EventData)
     }
 }
 
-void UPDCardActorManager::OnCurrentLocationChanged(const UObject* EventData)
-{
-    const UPDCurrentLocationChangedEvent* CurrentLocationChangedEvent = Cast<UPDCurrentLocationChangedEvent>(EventData);
-
-    // Remove old location
-    if (IsValid(CurrentLocationCard))
-    {
-        CurrentLocationCard->Destroy();
-    }
-
-    // Create location card actor.
-    APDCardActor* CardActor = GetWorld()->SpawnActor<APDCardActor>(CardActorClass, LocationCardLocation, FRotator::ZeroRotator);
-
-    if (IsValid(CardActor))
-    {
-        InitCardActor(CardActor, 0, CurrentLocationChangedEvent->BlueprintId);
-        CurrentLocationCard = CardActor;
-    }
-}
-
 void UPDCardActorManager::OnCardPlayed(const UObject* EventData)
 {
     const UPDCardPlayedEvent* CardPlayedEvent = Cast<UPDCardPlayedEvent>(EventData);
 
+    // Create card actor.
+    APDCardActor* CardActor = GetWorld()->SpawnActor<APDCardActor>(CardActorClass);
+
+    if (!IsValid(CardActor))
+    {
+        return;
+    }
+
+    InitCardActor(CardActor, CardPlayedEvent->EntityId, CardPlayedEvent->BlueprintId);
+
+    // Set owner.
+    UPDOwnerComponent* OwnerComponent = CardActor->FindComponentByClass<UPDOwnerComponent>();
+    OwnerComponent->SetOwnerEntityId(CardPlayedEvent->OwnerEntityId);
+
+    // Check if location card.
+    UPDGameplayTagsComponent* GameplayTagsComponent = CardActor->FindComponentByClass<UPDGameplayTagsComponent>();
+    bool bIsLocationCard = IsValid(GameplayTagsComponent) && GameplayTagsComponent->GetCardType() == EPDCardType::CARDTYPE_Location;
+
+    if (bIsLocationCard)
+    {
+        CardActor->SetActorLocation(LocationCardLocation);
+
+        if (IsValid(CurrentLocationCard))
+        {
+            CurrentLocationCard->Destroy();
+        }
+
+        CurrentLocationCard = CardActor;
+        return;
+    }
+
+    // Check if player card.
     APDPlayerController* PlayerController = Cast<APDPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
     bool bIsPlayerCard = IsValid(PlayerController) && PlayerController->IsLocalPlayer(CardPlayedEvent->OwnerEntityId);
 
-    // Calculate location.
-    FVector CardLocation;
-
     if (bIsPlayerCard)
     {
-        CardLocation = PlayerShipsStartLocation + LocalPlayerCards.Num() * PlayerShipsCardPadding;
-    }
-    else
-    {
-        CardLocation = EnemyShipsStartLocation + EnemyCards.Num() * EnemyShipsCardPadding;
+        CardActor->SetActorLocation(PlayerShipsStartLocation + LocalPlayerCards.Num() * PlayerShipsCardPadding);
+        LocalPlayerCards.Add(CardActor);
+        return;
     }
 
-    // Create card actor.
-    APDCardActor* CardActor = GetWorld()->SpawnActor<APDCardActor>(CardActorClass, CardLocation, FRotator::ZeroRotator);
-
-    if (IsValid(CardActor))
-    {
-        InitCardActor(CardActor, CardPlayedEvent->EntityId, CardPlayedEvent->BlueprintId);
-
-        if (bIsPlayerCard)
-        {
-            LocalPlayerCards.Add(CardActor);
-        }
-        else
-        {
-            EnemyCards.Add(CardActor);
-        }
-
-        // Set owner.
-        UPDOwnerComponent* OwnerComponent = CardActor->FindComponentByClass<UPDOwnerComponent>();
-        OwnerComponent->SetOwnerEntityId(CardPlayedEvent->OwnerEntityId);
-    }
+    // Must be enemy card.
+    CardActor->SetActorLocation(EnemyShipsStartLocation + EnemyCards.Num() * EnemyShipsCardPadding);
+    EnemyCards.Add(CardActor);
 }
 
 void UPDCardActorManager::OnStarshipAssigned(const UObject* EventData)

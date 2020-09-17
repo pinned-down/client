@@ -12,6 +12,7 @@
 
 class UPDAction;
 class UPDEventManager;
+class UPDGameplayTagsManager;
 
 UCLASS()
 class PINNEDDOWN_API APDGameMode : public AGameModeBase
@@ -32,6 +33,9 @@ public:
     UFUNCTION(BlueprintPure)
     UPDCardActorManager* GetCardActorManager() const;
 
+    UFUNCTION(BlueprintPure)
+    UPDGameplayTagsManager* GetGameplayTagsManager() const;
+
 private:
     UPROPERTY(EditDefaultsOnly)
     TSubclassOf<UPDCardActorManager> CardActorManagerClass;
@@ -44,6 +48,9 @@ private:
 
     UPROPERTY()
     UPDCardActorManager* CardActorManager;
+
+    UPROPERTY()
+    UPDGameplayTagsManager* GameplayTagsManager;
 
     void OnConnected(const FString& ProtocolVersion, const FString& SessionId, const FString& ServerString);
     void OnConnectionError(const FString& Error);

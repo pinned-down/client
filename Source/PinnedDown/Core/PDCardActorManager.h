@@ -93,9 +93,6 @@ private:
     void OnPlayerHandChanged(const UObject* EventData);
 
     UFUNCTION()
-    void OnCurrentLocationChanged(const UObject* EventData);
-
-    UFUNCTION()
     void OnCardPlayed(const UObject* EventData);
 
     UFUNCTION()

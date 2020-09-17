@@ -6,6 +6,7 @@
 
 #include "Core/PDLog.h"
 #include "Core/PDGameInstance.h"
+#include "Core/PDGameplayTagsManager.h"
 #include "Events/PDAction.h"
 #include "Events/PDEventManager.h"
 #include "Events/EventData/PDJoinGameAction.h"
@@ -27,6 +28,9 @@ void APDGameMode::InitGame(const FString& MapName, const FString& Options, FStri
 
     CardActorManager = NewObject<UPDCardActorManager>(this, CardActorManagerClass);
     CardActorManager->Init(EventManager);
+
+    GameplayTagsManager = NewObject<UPDGameplayTagsManager>(this);
+    GameplayTagsManager->Init(EventManager);
 
     // Connect to server.
     FString ServerEndpoint = UGameplayStatics::ParseOption(Options, TEXT("server"));
@@ -88,6 +92,11 @@ UPDEventManager* APDGameMode::GetEventManager() const
 UPDCardActorManager* APDGameMode::GetCardActorManager() const
 {
     return CardActorManager;
+}
+
+UPDGameplayTagsManager* APDGameMode::GetGameplayTagsManager() const
+{
+    return GameplayTagsManager;
 }
 
 void APDGameMode::OnConnected(const FString& ProtocolVersion, const FString& SessionId, const FString& ServerString)

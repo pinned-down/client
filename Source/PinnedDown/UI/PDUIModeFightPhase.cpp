@@ -1,6 +1,10 @@
 #include "PDUIModeFightPhase.h"
 
+#include "Kismet/GameplayStatics.h"
+
 #include "Core/PDCardActor.h"
+#include "Core/PDGameMode.h"
+#include "Core/PDGameplayTagsManager.h"
 #include "Core/PDLog.h"
 #include "Core/PDPlayerController.h"
 #include "Data/PDAbility.h"
@@ -88,19 +92,34 @@ void UPDUIModeFightPhase::HandleEffectClicked(APDCardActor* ClickedActor)
         return;
     }
 
-    bool bHasAbilityForFightPhase = false;
+    APDGameMode* GameMode = Cast<APDGameMode>(UGameplayStatics::GetGameMode(this));
+
+    if (!IsValid(GameMode))
+    {
+        return;
+    }
+
+    UPDGameplayTagsManager* GameplayTagsManager = GameMode->GetGameplayTagsManager();
+
+    if (!IsValid(GameplayTagsManager))
+    {
+        return;
+    }
+
+    bool bMeetsRequiredTags = false;
     EPDAbilityTargetType AbilityTargetType = EPDAbilityTargetType::TARGETTYPE_Passive;
 
     for (const FPDAbility& Ability : AbilitiesComponent->GetAbilities())
     {
-        if (Ability.GetTurnPhase() == EPDTurnPhase::TURNPHASE_Fight)
+        if (GameplayTagsManager->HasAllGlobalTags(Ability.RequiredTags))
         {
-            bHasAbilityForFightPhase = true;
+            bMeetsRequiredTags = true;
             AbilityTargetType = Ability.GetTargetType();
+            break;
         }
     }
 
-    if (!bHasAbilityForFightPhase)
+    if (!bMeetsRequiredTags)
     {
         return;
     }
