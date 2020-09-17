@@ -25,10 +25,8 @@ UPDCardActorManager::UPDCardActorManager(const FObjectInitializer& ObjectInitial
     CardActorClass = APDCardActor::StaticClass();
 }
 
-void UPDCardActorManager::Init(UPDEventManager* InEventManager)
+void UPDCardActorManager::Init()
 {
-    EventManager = InEventManager;
-
     // Register for events.
     PDCreateDynamicDelegate(FPDEventListenerSignature, OnPlayerHandChanged, &UPDCardActorManager::OnPlayerHandChanged);
     EventManager->AddListener(TEXT("PDPlayerHandChangedEvent"), OnPlayerHandChanged);

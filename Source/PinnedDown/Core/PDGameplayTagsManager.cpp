@@ -4,10 +4,8 @@
 #include "Events/PDEventManager.h"
 #include "Events/EventData/PDGlobalGameplayTagsChangedEvent.h"
 
-void UPDGameplayTagsManager::Init(UPDEventManager* InEventManager)
+void UPDGameplayTagsManager::Init()
 {
-    EventManager = InEventManager;
-
     // Register for events.
     PDCreateDynamicDelegate(FPDEventListenerSignature, OnGlobalGameplayTagsChanged, &UPDGameplayTagsManager::OnGlobalGameplayTagsChanged);
     EventManager->AddListener(TEXT("PDGlobalGameplayTagsChangedEvent"), OnGlobalGameplayTagsChanged);

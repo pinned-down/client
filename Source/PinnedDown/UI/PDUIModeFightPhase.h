@@ -6,6 +6,7 @@
 
 #include "PDUIModeFightPhase.generated.h"
 
+class UPDGameplayTagsManager;
 class APDCardActor;
 
 UCLASS(BlueprintType)
@@ -17,6 +18,9 @@ public:
     virtual void HandleCardClicked(APDCardActor* ClickedActor);
 
 private:
+    UPROPERTY(meta=(Inject))
+    UPDGameplayTagsManager* GameplayTagsManager;
+
     UPROPERTY()
     APDCardActor* EffectToPickTargetFor;
 

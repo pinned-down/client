@@ -3,7 +3,6 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "Core/PDCardActor.h"
-#include "Core/PDGameMode.h"
 #include "Core/PDGameplayTagsManager.h"
 #include "Core/PDLog.h"
 #include "Core/PDPlayerController.h"
@@ -88,20 +87,6 @@ void UPDUIModeFightPhase::HandleEffectClicked(APDCardActor* ClickedActor)
     UPDAbilitiesComponent* AbilitiesComponent = ClickedActor->FindComponentByClass<UPDAbilitiesComponent>();
 
     if (!IsValid(AbilitiesComponent))
-    {
-        return;
-    }
-
-    APDGameMode* GameMode = Cast<APDGameMode>(UGameplayStatics::GetGameMode(this));
-
-    if (!IsValid(GameMode))
-    {
-        return;
-    }
-
-    UPDGameplayTagsManager* GameplayTagsManager = GameMode->GetGameplayTagsManager();
-
-    if (!IsValid(GameplayTagsManager))
     {
         return;
     }

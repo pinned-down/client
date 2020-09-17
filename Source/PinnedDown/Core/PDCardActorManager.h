@@ -15,7 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerCardHoveredSignat
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerCardUnhoveredSignature, APDCardActor*, UnhoveredActor);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerCardClickedSignature, APDCardActor*, ClickedActor);
 
-UCLASS(BlueprintType, Blueprintable)
+UCLASS(BlueprintType, Blueprintable, meta=(Inject))
 class PINNEDDOWN_API UPDCardActorManager : public UObject
 {
     GENERATED_BODY()
@@ -23,7 +23,7 @@ class PINNEDDOWN_API UPDCardActorManager : public UObject
 public:
     UPDCardActorManager(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-    void Init(UPDEventManager* InEventManager);
+    void Init();
 
     UFUNCTION(BlueprintPure)
     APDCardActor* GetCardActor(int64 EntityId) const;
@@ -68,7 +68,7 @@ private:
     UPROPERTY(EditDefaultsOnly)
     FVector AttachedCardOffset;
 
-    UPROPERTY()
+    UPROPERTY(meta=(Inject))
     UPDEventManager* EventManager;
 
     UPROPERTY()
