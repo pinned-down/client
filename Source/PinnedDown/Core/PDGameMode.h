@@ -10,6 +10,8 @@
 
 #include "PDGameMode.generated.h"
 
+class UUDIContext;
+
 class UPDAction;
 class UPDEventManager;
 class UPDGameplayTagsManager;
@@ -27,6 +29,8 @@ public:
 
     void SendActionToServer(UPDAction* Action);
 
+    UUDIContext* GetUDIContext() const;
+
     UFUNCTION(BlueprintPure)
     UPDEventManager* GetEventManager() const;
 
@@ -42,6 +46,9 @@ private:
 
     FString WebSocketUrl;
     TSharedPtr<IStompClient> StompClient;
+
+    UPROPERTY()
+    UUDIContext* UDIContext;
 
     UPROPERTY()
     UPDEventManager* EventManager;

@@ -8,7 +8,7 @@
 
 #include "PDEventManager.generated.h"
 
-UCLASS(BlueprintType)
+UCLASS(BlueprintType, meta=(Inject))
 class PINNEDDOWN_API UPDEventManager : public UObject
 {
     GENERATED_BODY()

@@ -2,6 +2,8 @@
 
 #include "Kismet/GameplayStatics.h"
 
+#include "UDIContext.h"
+
 #include "Core/PDCardActorManager.h"
 #include "Core/PDDelegate.h"
 #include "Core/PDGameInstance.h"
@@ -131,13 +133,27 @@ void APDPlayerController::OnTurnPhaseStarted(const UObject* EventData)
 {
     const UPDTurnPhaseStartedEvent* TurnPhasedStartedEvent = Cast<UPDTurnPhaseStartedEvent>(EventData);
 
+    APDGameMode* GameMode = Cast<APDGameMode>(UGameplayStatics::GetGameMode(this));
+
+    if (!IsValid(GameMode))
+    {
+        return;
+    }
+
+    UUDIContext* UDIContext = GameMode->GetUDIContext();
+
+    if (!IsValid(UDIContext))
+    {
+        return;
+    }
+
     if (TurnPhasedStartedEvent->GetTurnPhase() == EPDTurnPhase::TURNPHASE_Assignment)
     {
-        SetUIMode(NewObject<UPDUIModeAssignmentPhase>(this));
+        SetUIMode(UDIContext->Construct<UPDUIModeAssignmentPhase>());
     }
     else if (TurnPhasedStartedEvent->GetTurnPhase() == EPDTurnPhase::TURNPHASE_Fight)
     {
-        SetUIMode(NewObject<UPDUIModeFightPhase>(this));
+        SetUIMode(UDIContext->Construct<UPDUIModeFightPhase>());
     }
     else if (TurnPhasedStartedEvent->GetTurnPhase() == EPDTurnPhase::TURNPHASE_Jump)
     {
