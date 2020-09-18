@@ -89,3 +89,20 @@ FName APDCardActor::GetCardId() const
 {
     return CardId;
 }
+
+bool APDCardActor::ShowSmallVersion() const
+{
+    return bShowSmallVersion;
+}
+
+void APDCardActor::SetShowSmallVersion(bool bInShowSmallVersion)
+{
+    if (bInShowSmallVersion == bShowSmallVersion)
+    {
+        return;
+    }
+
+    bShowSmallVersion = bInShowSmallVersion;
+
+    OnShowSmallVersionChanged(bShowSmallVersion);
+}

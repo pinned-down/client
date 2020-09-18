@@ -31,11 +31,19 @@ public:
     UFUNCTION(BlueprintImplementableEvent)
     void OnCardInitialized(int64 InEntityId, const FName& InCardId);
 
+    UFUNCTION(BlueprintImplementableEvent)
+    void OnShowSmallVersionChanged(bool bInShowSmallVersion);
+
     UFUNCTION(BlueprintPure)
     int64 GetEntityId() const;
 
     UFUNCTION(BlueprintPure)
     FName GetCardId() const;
+
+    UFUNCTION(BlueprintPure)
+    bool ShowSmallVersion() const;
+
+    void SetShowSmallVersion(bool bInShowSmallVersion);
 
 private:
     UPROPERTY(VisibleAnywhere)
@@ -43,6 +51,9 @@ private:
 
     UPROPERTY(VisibleAnywhere)
     FName CardId;
+
+    UPROPERTY(VisibleAnywhere)
+    bool bShowSmallVersion;
 
     UPROPERTY(VisibleAnywhere)
     UPDAbilitiesComponent* AbilitiesComponent;

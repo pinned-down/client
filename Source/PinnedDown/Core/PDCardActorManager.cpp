@@ -251,12 +251,16 @@ void UPDCardActorManager::OnCardPlayed(const UObject* EventData)
     if (bIsPlayerCard)
     {
         CardActor->SetActorLocation(PlayerShipsStartLocation + LocalPlayerCards.Num() * PlayerShipsCardPadding);
+        CardActor->SetShowSmallVersion(true);
+
         LocalPlayerCards.Add(CardActor);
         return;
     }
 
     // Must be enemy card.
     CardActor->SetActorLocation(EnemyShipsStartLocation + EnemyCards.Num() * EnemyShipsCardPadding);
+    CardActor->SetShowSmallVersion(true);
+
     EnemyCards.Add(CardActor);
 }
 
@@ -323,6 +327,7 @@ void UPDCardActorManager::OnStarshipDamaged(const UObject* EventData)
         DamageCards.Add(CardActor);
 
         CardActor->AttachToActor(AttachedTo, FAttachmentTransformRules::KeepWorldTransform);
+        CardActor->SetShowSmallVersion(true);
 
         // Store attachment.
         UPDAttachmentComponent* AttachmentComponent = CardActor->FindComponentByClass<UPDAttachmentComponent>();
