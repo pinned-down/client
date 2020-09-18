@@ -14,6 +14,7 @@
 #include "Events/PDEventManager.h"
 #include "Events/EventData/PDCardPlayedEvent.h"
 #include "Events/EventData/PDCardRemovedEvent.h"
+#include "Events/EventData/PDPlayerDiscardPileChangedEvent.h"
 #include "Events/EventData/PDPlayerDrawDeckSizeChangedEvent.h"
 #include "Events/EventData/PDPlayerHandChangedEvent.h"
 #include "Events/EventData/PDStarshipAssignedEvent.h"
@@ -49,6 +50,9 @@ void UPDCardActorManager::Init()
 
     PDCreateDynamicDelegate(FPDEventListenerSignature, OnPlayerDrawDeckSizeChanged, &UPDCardActorManager::OnPlayerDrawDeckSizeChanged);
     EventManager->AddListener(TEXT("PDPlayerDrawDeckSizeChangedEvent"), OnPlayerDrawDeckSizeChanged);
+
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnPlayerDiscardPileChanged, &UPDCardActorManager::OnPlayerDiscardPileChanged);
+    EventManager->AddListener(TEXT("PDPlayerDiscardPileChangedEvent"), OnPlayerDiscardPileChanged);
 }
 
 APDCardActor* UPDCardActorManager::GetCardActor(int64 EntityId) const
@@ -109,6 +113,56 @@ void UPDCardActorManager::OnPlayerDrawDeckSizeChanged(const UObject* EventData)
         TopDrawDeckCard->Destroy();
 
         TopDrawDeckCard = nullptr;
+    }
+}
+
+void UPDCardActorManager::OnPlayerDiscardPileChanged(const UObject* EventData)
+{
+    const UPDPlayerDiscardPileChangedEvent* PlayerDiscardPileChangedEvent = Cast<UPDPlayerDiscardPileChangedEvent>(EventData);
+
+    APDPlayerController* PlayerController = Cast<APDPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+
+    if (!IsValid(PlayerController))
+    {
+        return;
+    }
+
+    if (!PlayerController->IsLocalPlayer(PlayerDiscardPileChangedEvent->PlayerEntityId))
+    {
+        return;
+    }
+
+    if (PlayerDiscardPileChangedEvent->Cards.Num() > 0)
+    {
+        // Create top discard pile card actor, if necessary.
+        if (!IsValid(TopDiscardPileCard))
+        {
+            TopDiscardPileCard = GetWorld()->SpawnActor<APDCardActor>(CardActorClass);
+
+            TopDiscardPileCard->OnBeginCursorOver.AddDynamic(this, &UPDCardActorManager::OnBeginCursorOverDiscardPile);
+            TopDiscardPileCard->OnEndCursorOver.AddDynamic(this, &UPDCardActorManager::OnEndCursorOverDiscardPile);
+            TopDiscardPileCard->OnClicked.AddDynamic(this, &UPDCardActorManager::OnClickedDiscardPile);
+
+            TopDiscardPileCard->SetActorLocation(DiscardPileLocation);
+        }
+
+        TopDiscardPileCard->Init(0, FName(PlayerDiscardPileChangedEvent->Cards.Last()));
+    }
+    else
+    {
+        // Remove top discard pile card, if necessary.
+        if (!IsValid(TopDiscardPileCard))
+        {
+            return;
+        }
+
+        TopDiscardPileCard->OnBeginCursorOver.RemoveDynamic(this, &UPDCardActorManager::OnBeginCursorOverDrawDeck);
+        TopDiscardPileCard->OnEndCursorOver.RemoveDynamic(this, &UPDCardActorManager::OnEndCursorOverDrawDeck);
+        TopDiscardPileCard->OnClicked.RemoveDynamic(this, &UPDCardActorManager::OnClickedDiscardPile);
+
+        TopDiscardPileCard->Destroy();
+
+        TopDiscardPileCard = nullptr;
     }
 }
 
@@ -327,6 +381,11 @@ void UPDCardActorManager::OnEndCursorOver(AActor* TouchedActor)
     OnCardUnhovered.Broadcast(Cast<APDCardActor>(TouchedActor));
 }
 
+void UPDCardActorManager::OnClicked(AActor* TouchedActor, FKey ButtonPressed)
+{
+    OnCardClicked.Broadcast(Cast<APDCardActor>(TouchedActor));
+}
+
 void UPDCardActorManager::OnBeginCursorOverDrawDeck(AActor* TouchedActor)
 {
     OnDrawDeckHovered.Broadcast();
@@ -337,9 +396,19 @@ void UPDCardActorManager::OnEndCursorOverDrawDeck(AActor* TouchedActor)
     OnDrawDeckUnhovered.Broadcast();
 }
 
-void UPDCardActorManager::OnClicked(AActor* TouchedActor, FKey ButtonPressed)
+void UPDCardActorManager::OnBeginCursorOverDiscardPile(AActor* TouchedActor)
 {
-    OnCardClicked.Broadcast(Cast<APDCardActor>(TouchedActor));
+    OnDiscardPileHovered.Broadcast();
+}
+
+void UPDCardActorManager::OnEndCursorOverDiscardPile(AActor* TouchedActor)
+{
+    OnDiscardPileUnhovered.Broadcast();
+}
+
+void UPDCardActorManager::OnClickedDiscardPile(AActor* TouchedActor, FKey ButtonPressed)
+{
+    OnDiscardPileClicked.Broadcast();
 }
 
 void UPDCardActorManager::InitCardActor(APDCardActor* CardActor, int64 EntityId, const FString& CardId)

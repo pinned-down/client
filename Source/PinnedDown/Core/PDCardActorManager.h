@@ -18,6 +18,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerCardClickedSignat
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerDrawDeckHoveredSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerDrawDeckUnhoveredSignature);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerDiscardPileHoveredSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerDiscardPileUnhoveredSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerDiscardPileClickedSignature);
+
 UCLASS(BlueprintType, Blueprintable, meta=(Inject))
 class PINNEDDOWN_API UPDCardActorManager : public UObject
 {
@@ -38,13 +42,22 @@ public:
     FPDCardActorManagerCardUnhoveredSignature OnCardUnhovered;
 
     UPROPERTY(BlueprintAssignable)
+    FPDCardActorManagerCardClickedSignature OnCardClicked;
+
+    UPROPERTY(BlueprintAssignable)
     FPDCardActorManagerDrawDeckHoveredSignature OnDrawDeckHovered;
 
     UPROPERTY(BlueprintAssignable)
     FPDCardActorManagerDrawDeckUnhoveredSignature OnDrawDeckUnhovered;
 
     UPROPERTY(BlueprintAssignable)
-    FPDCardActorManagerCardClickedSignature OnCardClicked;
+    FPDCardActorManagerDiscardPileHoveredSignature OnDiscardPileHovered;
+
+    UPROPERTY(BlueprintAssignable)
+    FPDCardActorManagerDiscardPileUnhoveredSignature OnDiscardPileUnhovered;
+
+    UPROPERTY(BlueprintAssignable)
+    FPDCardActorManagerDiscardPileClickedSignature OnDiscardPileClicked;
 
 private:
     UPROPERTY(EditDefaultsOnly)
@@ -83,6 +96,9 @@ private:
     UPROPERTY(EditDefaultsOnly)
     FRotator DrawDeckRotation;
 
+    UPROPERTY(EditDefaultsOnly)
+    FVector DiscardPileLocation;
+
     UPROPERTY(meta=(Inject))
     UPDEventManager* EventManager;
 
@@ -107,8 +123,14 @@ private:
     UPROPERTY()
     APDCardActor* TopDrawDeckCard;
 
+    UPROPERTY()
+    APDCardActor* TopDiscardPileCard;
+
     UFUNCTION()
     void OnPlayerDrawDeckSizeChanged(const UObject* EventData);
+
+    UFUNCTION()
+    void OnPlayerDiscardPileChanged(const UObject* EventData);
 
     UFUNCTION()
     void OnPlayerHandChanged(const UObject* EventData);
@@ -135,13 +157,22 @@ private:
     void OnEndCursorOver(AActor* TouchedActor);
 
     UFUNCTION()
+    void OnClicked(AActor* TouchedActor, FKey ButtonPressed);
+
+    UFUNCTION()
     void OnBeginCursorOverDrawDeck(AActor* TouchedActor);
 
     UFUNCTION()
     void OnEndCursorOverDrawDeck(AActor* TouchedActor);
 
     UFUNCTION()
-    void OnClicked(AActor* TouchedActor, FKey ButtonPressed);
+    void OnBeginCursorOverDiscardPile(AActor* TouchedActor);
+
+    UFUNCTION()
+    void OnEndCursorOverDiscardPile(AActor* TouchedActor);
+
+    UFUNCTION()
+    void OnClickedDiscardPile(AActor* TouchedActor, FKey ButtonPressed);
 
     void InitCardActor(APDCardActor* CardActor, int64 EntityId, const FString& CardId);
 };
