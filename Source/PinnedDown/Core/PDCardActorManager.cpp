@@ -14,6 +14,7 @@
 #include "Events/PDEventManager.h"
 #include "Events/EventData/PDCardPlayedEvent.h"
 #include "Events/EventData/PDCardRemovedEvent.h"
+#include "Events/EventData/PDPlayerDrawDeckSizeChangedEvent.h"
 #include "Events/EventData/PDPlayerHandChangedEvent.h"
 #include "Events/EventData/PDStarshipAssignedEvent.h"
 #include "Events/EventData/PDStarshipDamagedEvent.h"
@@ -45,11 +46,70 @@ void UPDCardActorManager::Init()
 
     PDCreateDynamicDelegate(FPDEventListenerSignature, OnStarshipPowerChanged, &UPDCardActorManager::OnStarshipPowerChanged);
     EventManager->AddListener(TEXT("PDStarshipPowerChangedEvent"), OnStarshipPowerChanged);
+
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnPlayerDrawDeckSizeChanged, &UPDCardActorManager::OnPlayerDrawDeckSizeChanged);
+    EventManager->AddListener(TEXT("PDPlayerDrawDeckSizeChangedEvent"), OnPlayerDrawDeckSizeChanged);
 }
 
 APDCardActor* UPDCardActorManager::GetCardActor(int64 EntityId) const
 {
     return Cards.FindRef(EntityId);
+}
+
+void UPDCardActorManager::OnPlayerDrawDeckSizeChanged(const UObject* EventData)
+{
+    const UPDPlayerDrawDeckSizeChangedEvent* PlayerDrawDeckSizeChangedEvent = Cast<UPDPlayerDrawDeckSizeChangedEvent>(EventData);
+
+    APDPlayerController* PlayerController = Cast<APDPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+
+    if (!IsValid(PlayerController))
+    {
+        return;
+    }
+
+    if (!PlayerController->IsLocalPlayer(PlayerDrawDeckSizeChangedEvent->PlayerEntityId))
+    {
+        return;
+    }
+
+    if (PlayerDrawDeckSizeChangedEvent->DrawDeckSize > 0)
+    {
+        // Create top draw deck actor, if necessary.
+        if (IsValid(TopDrawDeckCard))
+        {
+            return;
+        }
+
+        APDCardActor* CardActor = GetWorld()->SpawnActor<APDCardActor>(CardActorClass);
+
+        if (!IsValid(CardActor))
+        {
+            return;
+        }
+
+        CardActor->OnBeginCursorOver.AddDynamic(this, &UPDCardActorManager::OnBeginCursorOverDrawDeck);
+        CardActor->OnEndCursorOver.AddDynamic(this, &UPDCardActorManager::OnEndCursorOverDrawDeck);
+
+        CardActor->SetActorLocation(DrawDeckLocation);
+        CardActor->SetActorRotation(DrawDeckRotation);
+
+        TopDrawDeckCard = CardActor;
+    }
+    else
+    {
+        // Remove top draw deck card, if necessary.
+        if (!IsValid(TopDrawDeckCard))
+        {
+            return;
+        }
+
+        TopDrawDeckCard->OnBeginCursorOver.RemoveDynamic(this, &UPDCardActorManager::OnBeginCursorOverDrawDeck);
+        TopDrawDeckCard->OnEndCursorOver.RemoveDynamic(this, &UPDCardActorManager::OnEndCursorOverDrawDeck);
+
+        TopDrawDeckCard->Destroy();
+
+        TopDrawDeckCard = nullptr;
+    }
 }
 
 void UPDCardActorManager::OnPlayerHandChanged(const UObject* EventData)
@@ -265,6 +325,16 @@ void UPDCardActorManager::OnBeginCursorOver(AActor* TouchedActor)
 void UPDCardActorManager::OnEndCursorOver(AActor* TouchedActor)
 {
     OnCardUnhovered.Broadcast(Cast<APDCardActor>(TouchedActor));
+}
+
+void UPDCardActorManager::OnBeginCursorOverDrawDeck(AActor* TouchedActor)
+{
+    OnDrawDeckHovered.Broadcast();
+}
+
+void UPDCardActorManager::OnEndCursorOverDrawDeck(AActor* TouchedActor)
+{
+    OnDrawDeckUnhovered.Broadcast();
 }
 
 void UPDCardActorManager::OnClicked(AActor* TouchedActor, FKey ButtonPressed)

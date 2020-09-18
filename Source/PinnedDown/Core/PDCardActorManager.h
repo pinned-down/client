@@ -15,6 +15,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerCardHoveredSignat
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerCardUnhoveredSignature, APDCardActor*, UnhoveredActor);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerCardClickedSignature, APDCardActor*, ClickedActor);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerDrawDeckHoveredSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerDrawDeckUnhoveredSignature);
+
 UCLASS(BlueprintType, Blueprintable, meta=(Inject))
 class PINNEDDOWN_API UPDCardActorManager : public UObject
 {
@@ -33,6 +36,12 @@ public:
 
     UPROPERTY(BlueprintAssignable)
     FPDCardActorManagerCardUnhoveredSignature OnCardUnhovered;
+
+    UPROPERTY(BlueprintAssignable)
+    FPDCardActorManagerDrawDeckHoveredSignature OnDrawDeckHovered;
+
+    UPROPERTY(BlueprintAssignable)
+    FPDCardActorManagerDrawDeckUnhoveredSignature OnDrawDeckUnhovered;
 
     UPROPERTY(BlueprintAssignable)
     FPDCardActorManagerCardClickedSignature OnCardClicked;
@@ -68,6 +77,12 @@ private:
     UPROPERTY(EditDefaultsOnly)
     FVector AttachedCardOffset;
 
+    UPROPERTY(EditDefaultsOnly)
+    FVector DrawDeckLocation;
+
+    UPROPERTY(EditDefaultsOnly)
+    FRotator DrawDeckRotation;
+
     UPROPERTY(meta=(Inject))
     UPDEventManager* EventManager;
 
@@ -88,6 +103,12 @@ private:
 
     UPROPERTY()
     TArray<APDCardActor*> DamageCards;
+
+    UPROPERTY()
+    APDCardActor* TopDrawDeckCard;
+
+    UFUNCTION()
+    void OnPlayerDrawDeckSizeChanged(const UObject* EventData);
 
     UFUNCTION()
     void OnPlayerHandChanged(const UObject* EventData);
@@ -112,6 +133,12 @@ private:
 
     UFUNCTION()
     void OnEndCursorOver(AActor* TouchedActor);
+
+    UFUNCTION()
+    void OnBeginCursorOverDrawDeck(AActor* TouchedActor);
+
+    UFUNCTION()
+    void OnEndCursorOverDrawDeck(AActor* TouchedActor);
 
     UFUNCTION()
     void OnClicked(AActor* TouchedActor, FKey ButtonPressed);
