@@ -132,37 +132,38 @@ void UPDCardActorManager::OnPlayerDiscardPileChanged(const UObject* EventData)
         return;
     }
 
-    if (PlayerDiscardPileChangedEvent->Cards.Num() > 0)
+    // Clear old discard pile.
+    for (APDCardActor* OldCard : DiscardPileCards)
     {
-        // Create top discard pile card actor, if necessary.
-        if (!IsValid(TopDiscardPileCard))
-        {
-            TopDiscardPileCard = GetWorld()->SpawnActor<APDCardActor>(CardActorClass);
-
-            TopDiscardPileCard->OnBeginCursorOver.AddDynamic(this, &UPDCardActorManager::OnBeginCursorOverDiscardPile);
-            TopDiscardPileCard->OnEndCursorOver.AddDynamic(this, &UPDCardActorManager::OnEndCursorOverDiscardPile);
-            TopDiscardPileCard->OnClicked.AddDynamic(this, &UPDCardActorManager::OnClickedDiscardPile);
-
-            TopDiscardPileCard->SetActorLocation(DiscardPileLocation);
-        }
-
-        TopDiscardPileCard->Init(0, FName(PlayerDiscardPileChangedEvent->Cards.Last()));
+        OldCard->Destroy();
     }
-    else
+
+    DiscardPileCards.Empty();
+
+    // Create discard pile card actors.
+    for (int32 Index = 0; Index < PlayerDiscardPileChangedEvent->Cards.Num(); ++Index)
     {
-        // Remove top discard pile card, if necessary.
-        if (!IsValid(TopDiscardPileCard))
+        const FString& CardName = PlayerDiscardPileChangedEvent->Cards[Index];
+
+        APDCardActor* CardActor = GetWorld()->SpawnActor<APDCardActor>(CardActorClass, DiscardPileLocation, FRotator::ZeroRotator);
+
+        if (IsValid(CardActor))
         {
-            return;
+            CardActor->Init(0, FName(CardName));
+            DiscardPileCards.Add(CardActor);
+
+            // Show top card only.
+            if (Index < PlayerDiscardPileChangedEvent->Cards.Num() - 1)
+            {
+                CardActor->SetActorHiddenInGame(true);
+            }
+            else
+            {
+                CardActor->OnBeginCursorOver.AddDynamic(this, &UPDCardActorManager::OnBeginCursorOverDiscardPile);
+                CardActor->OnEndCursorOver.AddDynamic(this, &UPDCardActorManager::OnEndCursorOverDiscardPile);
+                CardActor->OnClicked.AddDynamic(this, &UPDCardActorManager::OnClickedDiscardPile);
+            }
         }
-
-        TopDiscardPileCard->OnBeginCursorOver.RemoveDynamic(this, &UPDCardActorManager::OnBeginCursorOverDrawDeck);
-        TopDiscardPileCard->OnEndCursorOver.RemoveDynamic(this, &UPDCardActorManager::OnEndCursorOverDrawDeck);
-        TopDiscardPileCard->OnClicked.RemoveDynamic(this, &UPDCardActorManager::OnClickedDiscardPile);
-
-        TopDiscardPileCard->Destroy();
-
-        TopDiscardPileCard = nullptr;
     }
 }
 
@@ -408,7 +409,7 @@ void UPDCardActorManager::OnEndCursorOverDiscardPile(AActor* TouchedActor)
 
 void UPDCardActorManager::OnClickedDiscardPile(AActor* TouchedActor, FKey ButtonPressed)
 {
-    OnDiscardPileClicked.Broadcast();
+    OnDiscardPileClicked.Broadcast(DiscardPileCards);
 }
 
 void UPDCardActorManager::InitCardActor(APDCardActor* CardActor, int64 EntityId, const FString& CardId)

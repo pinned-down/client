@@ -20,7 +20,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerDrawDeckUnhoveredSignature
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerDiscardPileHoveredSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerDiscardPileUnhoveredSignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerDiscardPileClickedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerDiscardPileClickedSignature, const TArray<APDCardActor*>&, DiscardPile);
 
 UCLASS(BlueprintType, Blueprintable, meta=(Inject))
 class PINNEDDOWN_API UPDCardActorManager : public UObject
@@ -124,7 +124,7 @@ private:
     APDCardActor* TopDrawDeckCard;
 
     UPROPERTY()
-    APDCardActor* TopDiscardPileCard;
+    TArray<APDCardActor*> DiscardPileCards;
 
     UFUNCTION()
     void OnPlayerDrawDeckSizeChanged(const UObject* EventData);
