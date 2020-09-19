@@ -23,6 +23,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerDiscardPileHoveredSignatur
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerDiscardPileUnhoveredSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerDiscardPileClickedSignature, const TArray<APDCardActor*>&, DiscardPile);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerLocationCardHoveredSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerLocationCardUnhoveredSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerLocationCardClickedSignature, const TArray<APDCardActor*>&, LocationCards);
+
 UCLASS(BlueprintType, Blueprintable, meta=(Inject))
 class PINNEDDOWN_API APDCardActorManager : public AActor
 {
@@ -61,6 +65,15 @@ public:
     UPROPERTY(BlueprintAssignable)
     FPDCardActorManagerDiscardPileClickedSignature OnDiscardPileClicked;
 
+    UPROPERTY(BlueprintAssignable)
+    FPDCardActorManagerLocationCardHoveredSignature OnLocationCardHovered;
+
+    UPROPERTY(BlueprintAssignable)
+    FPDCardActorManagerLocationCardUnhoveredSignature OnLocationCardUnhovered;
+
+    UPROPERTY(BlueprintAssignable)
+    FPDCardActorManagerLocationCardClickedSignature OnLocationCardClicked;
+
 private:
     UPROPERTY(EditDefaultsOnly)
     TSubclassOf<APDCardActor> CardActorClass;
@@ -73,6 +86,9 @@ private:
 
     UPROPERTY(EditDefaultsOnly)
     FVector LocationCardLocation;
+
+    UPROPERTY(EditDefaultsOnly)
+    FVector LocationCardPadding;
 
     UPROPERTY(EditDefaultsOnly)
     FVector PlayerShipsStartLocation;
@@ -114,7 +130,7 @@ private:
     TArray<APDCardActor*> LocalPlayerCards;
 
     UPROPERTY()
-    APDCardActor* CurrentLocationCard;
+    TArray<APDCardActor*> LocationCards;
 
     UPROPERTY()
     TArray<APDCardActor*> EnemyCards;
@@ -178,6 +194,15 @@ private:
 
     UFUNCTION()
     void OnClickedDiscardPile(AActor* TouchedActor, FKey ButtonPressed);
+
+    UFUNCTION()
+    void OnBeginCursorOverLocationCard(AActor* TouchedActor);
+
+    UFUNCTION()
+    void OnEndCursorOverLocationCard(AActor* TouchedActor);
+
+    UFUNCTION()
+    void OnClickedLocationCard(AActor* TouchedActor, FKey ButtonPressed);
 
     void InitCardActor(APDCardActor* CardActor, int64 EntityId, const FString& CardId);
     void QueueCardAnimation(APDCardActor* CardActor, FPDCardAnimation CardAnimation);

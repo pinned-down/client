@@ -279,17 +279,17 @@ void APDCardActorManager::OnCardPlayed(const UObject* EventData)
     if (bIsLocationCard)
     {
         FPDCardAnimation CardAnimation;
-        CardAnimation.TargetLocation = LocationCardLocation;
+        CardAnimation.TargetLocation = LocationCardLocation + LocationCards.Num() * LocationCardPadding;
         CardAnimation.bShowSmallVersion = false;
 
         QueueCardAnimation(CardActor, CardAnimation);
 
-        if (IsValid(CurrentLocationCard))
-        {
-            CurrentLocationCard->Destroy();
-        }
+        LocationCards.Add(CardActor);
 
-        CurrentLocationCard = CardActor;
+        CardActor->OnBeginCursorOver.AddDynamic(this, &APDCardActorManager::OnBeginCursorOverLocationCard);
+        CardActor->OnEndCursorOver.AddDynamic(this, &APDCardActorManager::OnEndCursorOverLocationCard);
+        CardActor->OnClicked.AddDynamic(this, &APDCardActorManager::OnClickedLocationCard);
+
         return;
     }
 
@@ -399,7 +399,7 @@ void APDCardActorManager::OnCardRemoved(const UObject* EventData)
     const UPDCardRemovedEvent* CardRemovedEvent = Cast<UPDCardRemovedEvent>(EventData);
     APDCardActor* RemovedCard = Cards.FindRef(CardRemovedEvent->EntityId);
 
-    if (IsValid(RemovedCard))
+    if (IsValid(RemovedCard) && !LocationCards.Contains(RemovedCard))
     {
         Cards.Remove(RemovedCard->GetEntityId());
 
@@ -471,6 +471,21 @@ void APDCardActorManager::OnEndCursorOverDiscardPile(AActor* TouchedActor)
 void APDCardActorManager::OnClickedDiscardPile(AActor* TouchedActor, FKey ButtonPressed)
 {
     OnDiscardPileClicked.Broadcast(DiscardPileCards);
+}
+
+void APDCardActorManager::OnBeginCursorOverLocationCard(AActor* TouchedActor)
+{
+    OnLocationCardHovered.Broadcast();
+}
+
+void APDCardActorManager::OnEndCursorOverLocationCard(AActor* TouchedActor)
+{
+    OnLocationCardUnhovered.Broadcast();
+}
+
+void APDCardActorManager::OnClickedLocationCard(AActor* TouchedActor, FKey ButtonPressed)
+{
+    OnLocationCardClicked.Broadcast(LocationCards);
 }
 
 void APDCardActorManager::InitCardActor(APDCardActor* CardActor, int64 EntityId, const FString& CardId)
