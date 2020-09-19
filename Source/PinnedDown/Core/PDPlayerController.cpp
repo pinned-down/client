@@ -51,7 +51,7 @@ void APDPlayerController::BeginPlay()
     PDCreateDynamicDelegate(FPDEventListenerSignature, OnTurnPhaseStarted, &APDPlayerController::OnTurnPhaseStarted);
     EventManager->AddListener(TEXT("PDTurnPhaseStartedEvent"), OnTurnPhaseStarted);
 
-    UPDCardActorManager* CardActorManager = GameMode->GetCardActorManager();
+    APDCardActorManager* CardActorManager = GameMode->GetCardActorManager();
 
     if (IsValid(CardActorManager))
     {

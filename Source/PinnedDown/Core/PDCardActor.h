@@ -4,6 +4,8 @@
 
 #include "GameFramework/Actor.h"
 
+#include "UI/PDCardAnimation.h"
+
 #include "PDCardActor.generated.h"
 
 class UPDAbilitiesComponent;
@@ -40,6 +42,9 @@ public:
     UFUNCTION(BlueprintPure)
     FName GetCardId() const;
 
+    FPDCardAnimation GetCardAnimation() const;
+    void SetCardAnimation(FPDCardAnimation InCardAnimation);
+
     UFUNCTION(BlueprintPure)
     bool ShowSmallVersion() const;
 
@@ -54,6 +59,9 @@ private:
 
     UPROPERTY(VisibleAnywhere)
     bool bShowSmallVersion;
+    
+    UPROPERTY(VisibleAnywhere)
+    FPDCardAnimation CardAnimation;
 
     UPROPERTY(VisibleAnywhere)
     UPDAbilitiesComponent* AbilitiesComponent;

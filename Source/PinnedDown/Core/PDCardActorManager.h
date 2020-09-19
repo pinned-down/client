@@ -2,9 +2,10 @@
 
 #include "CoreMinimal.h"
 
-#include "UObject/Object.h"
+#include "GameFramework/Actor.h"
 
 #include "Core/PDCardActor.h"
+#include "UI/PDCardAnimation.h"
 
 #include "PDCardActorManager.generated.h"
 
@@ -23,14 +24,15 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerDiscardPileUnhoveredSignat
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerDiscardPileClickedSignature, const TArray<APDCardActor*>&, DiscardPile);
 
 UCLASS(BlueprintType, Blueprintable, meta=(Inject))
-class PINNEDDOWN_API UPDCardActorManager : public UObject
+class PINNEDDOWN_API APDCardActorManager : public AActor
 {
     GENERATED_BODY()
 
 public:
-    UPDCardActorManager(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+    APDCardActorManager(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
     void Init();
+    virtual void Tick(float DeltaSeconds) override;
 
     UFUNCTION(BlueprintPure)
     APDCardActor* GetCardActor(int64 EntityId) const;
@@ -126,6 +128,9 @@ private:
     UPROPERTY()
     TArray<APDCardActor*> DiscardPileCards;
 
+    UPROPERTY()
+    TArray<APDCardActor*> NewCards;
+
     UFUNCTION()
     void OnPlayerDrawDeckSizeChanged(const UObject* EventData);
 
@@ -175,4 +180,5 @@ private:
     void OnClickedDiscardPile(AActor* TouchedActor, FKey ButtonPressed);
 
     void InitCardActor(APDCardActor* CardActor, int64 EntityId, const FString& CardId);
+    void QueueCardAnimation(APDCardActor* CardActor, FPDCardAnimation CardAnimation);
 };

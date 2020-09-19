@@ -90,6 +90,16 @@ FName APDCardActor::GetCardId() const
     return CardId;
 }
 
+FPDCardAnimation APDCardActor::GetCardAnimation() const
+{
+    return CardAnimation;
+}
+
+void APDCardActor::SetCardAnimation(FPDCardAnimation InCardAnimation)
+{
+    CardAnimation = InCardAnimation;
+}
+
 bool APDCardActor::ShowSmallVersion() const
 {
     return bShowSmallVersion;

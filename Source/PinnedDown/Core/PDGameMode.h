@@ -35,14 +35,14 @@ public:
     UPDEventManager* GetEventManager() const;
 
     UFUNCTION(BlueprintPure)
-    UPDCardActorManager* GetCardActorManager() const;
+    APDCardActorManager* GetCardActorManager() const;
 
     UFUNCTION(BlueprintPure)
     UPDGameplayTagsManager* GetGameplayTagsManager() const;
 
 private:
     UPROPERTY(EditDefaultsOnly)
-    TSubclassOf<UPDCardActorManager> CardActorManagerClass;
+    TSubclassOf<APDCardActorManager> CardActorManagerClass;
 
     FString WebSocketUrl;
     TSharedPtr<IStompClient> StompClient;
@@ -54,7 +54,7 @@ private:
     UPDEventManager* EventManager;
 
     UPROPERTY()
-    UPDCardActorManager* CardActorManager;
+    APDCardActorManager* CardActorManager;
 
     UPROPERTY()
     UPDGameplayTagsManager* GameplayTagsManager;

@@ -20,47 +20,92 @@
 #include "Events/EventData/PDStarshipAssignedEvent.h"
 #include "Events/EventData/PDStarshipDamagedEvent.h"
 #include "Events/EventData/PDStarshipPowerChangedEvent.h"
+#include "UI/PDCardAnimation.h"
 
-UPDCardActorManager::UPDCardActorManager(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+APDCardActorManager::APDCardActorManager(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
     : Super(ObjectInitializer)
 {
+    PrimaryActorTick.bCanEverTick = true;
+
     CardActorClass = APDCardActor::StaticClass();
 }
 
-void UPDCardActorManager::Init()
+void APDCardActorManager::Init()
 {
     // Register for events.
-    PDCreateDynamicDelegate(FPDEventListenerSignature, OnPlayerHandChanged, &UPDCardActorManager::OnPlayerHandChanged);
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnPlayerHandChanged, &APDCardActorManager::OnPlayerHandChanged);
     EventManager->AddListener(TEXT("PDPlayerHandChangedEvent"), OnPlayerHandChanged);
 
-    PDCreateDynamicDelegate(FPDEventListenerSignature, OnCardPlayed, &UPDCardActorManager::OnCardPlayed);
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnCardPlayed, &APDCardActorManager::OnCardPlayed);
     EventManager->AddListener(TEXT("PDCardPlayedEvent"), OnCardPlayed);
 
-    PDCreateDynamicDelegate(FPDEventListenerSignature, OnStarshipAssigned, &UPDCardActorManager::OnStarshipAssigned);
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnStarshipAssigned, &APDCardActorManager::OnStarshipAssigned);
     EventManager->AddListener(TEXT("PDStarshipAssignedEvent"), OnStarshipAssigned);
 
-    PDCreateDynamicDelegate(FPDEventListenerSignature, OnStarshipDamaged, &UPDCardActorManager::OnStarshipDamaged);
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnStarshipDamaged, &APDCardActorManager::OnStarshipDamaged);
     EventManager->AddListener(TEXT("PDStarshipDamagedEvent"), OnStarshipDamaged);
 
-    PDCreateDynamicDelegate(FPDEventListenerSignature, OnCardRemoved, &UPDCardActorManager::OnCardRemoved);
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnCardRemoved, &APDCardActorManager::OnCardRemoved);
     EventManager->AddListener(TEXT("PDCardRemovedEvent"), OnCardRemoved);
 
-    PDCreateDynamicDelegate(FPDEventListenerSignature, OnStarshipPowerChanged, &UPDCardActorManager::OnStarshipPowerChanged);
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnStarshipPowerChanged, &APDCardActorManager::OnStarshipPowerChanged);
     EventManager->AddListener(TEXT("PDStarshipPowerChangedEvent"), OnStarshipPowerChanged);
 
-    PDCreateDynamicDelegate(FPDEventListenerSignature, OnPlayerDrawDeckSizeChanged, &UPDCardActorManager::OnPlayerDrawDeckSizeChanged);
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnPlayerDrawDeckSizeChanged, &APDCardActorManager::OnPlayerDrawDeckSizeChanged);
     EventManager->AddListener(TEXT("PDPlayerDrawDeckSizeChangedEvent"), OnPlayerDrawDeckSizeChanged);
 
-    PDCreateDynamicDelegate(FPDEventListenerSignature, OnPlayerDiscardPileChanged, &UPDCardActorManager::OnPlayerDiscardPileChanged);
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnPlayerDiscardPileChanged, &APDCardActorManager::OnPlayerDiscardPileChanged);
     EventManager->AddListener(TEXT("PDPlayerDiscardPileChangedEvent"), OnPlayerDiscardPileChanged);
 }
 
-APDCardActor* UPDCardActorManager::GetCardActor(int64 EntityId) const
+void APDCardActorManager::Tick(float DeltaSeconds)
+{
+    Super::Tick(DeltaSeconds);
+
+    if (NewCards.Num() <= 0)
+    {
+        return;
+    }
+
+    // Update card animations.
+    APDCardActor* NewCard = NewCards[0];
+    FPDCardAnimation CardAnimation = NewCard->GetCardAnimation();
+
+    NewCard->SetActorHiddenInGame(false);
+
+    if (CardAnimation.AnimationDelay > 0.0f)
+    {
+        CardAnimation.AnimationDelay -= DeltaSeconds;
+
+        NewCard->SetCardAnimation(CardAnimation);
+    }
+    else
+    {
+        CardAnimation.AnimationTimeElapsed += DeltaSeconds;
+        float Alpha = FMath::Clamp(CardAnimation.AnimationTimeElapsed / CardAnimation.AnimationDuration, 0.0f, 1.0f);
+        FVector NewLocation = FMath::InterpEaseInOut(CardAnimation.StartLocation,
+            CardAnimation.TargetLocation, Alpha, 2.0f);
+        NewCard->SetActorLocation(NewLocation);
+        NewCard->SetShowSmallVersion(CardAnimation.bShowSmallVersion);
+
+        if (CardAnimation.AnimationTimeElapsed >= CardAnimation.AnimationDuration)
+        {
+            NewCard->SetActorEnableCollision(true);
+            NewCards.RemoveAt(0);
+        }
+        else
+        {
+            NewCard->SetCardAnimation(CardAnimation);
+        }
+    }
+}
+
+APDCardActor* APDCardActorManager::GetCardActor(int64 EntityId) const
 {
     return Cards.FindRef(EntityId);
 }
 
-void UPDCardActorManager::OnPlayerDrawDeckSizeChanged(const UObject* EventData)
+void APDCardActorManager::OnPlayerDrawDeckSizeChanged(const UObject* EventData)
 {
     const UPDPlayerDrawDeckSizeChangedEvent* PlayerDrawDeckSizeChangedEvent = Cast<UPDPlayerDrawDeckSizeChangedEvent>(EventData);
 
@@ -91,8 +136,8 @@ void UPDCardActorManager::OnPlayerDrawDeckSizeChanged(const UObject* EventData)
             return;
         }
 
-        CardActor->OnBeginCursorOver.AddDynamic(this, &UPDCardActorManager::OnBeginCursorOverDrawDeck);
-        CardActor->OnEndCursorOver.AddDynamic(this, &UPDCardActorManager::OnEndCursorOverDrawDeck);
+        CardActor->OnBeginCursorOver.AddDynamic(this, &APDCardActorManager::OnBeginCursorOverDrawDeck);
+        CardActor->OnEndCursorOver.AddDynamic(this, &APDCardActorManager::OnEndCursorOverDrawDeck);
 
         CardActor->SetActorLocation(DrawDeckLocation);
         CardActor->SetActorRotation(DrawDeckRotation);
@@ -107,8 +152,8 @@ void UPDCardActorManager::OnPlayerDrawDeckSizeChanged(const UObject* EventData)
             return;
         }
 
-        TopDrawDeckCard->OnBeginCursorOver.RemoveDynamic(this, &UPDCardActorManager::OnBeginCursorOverDrawDeck);
-        TopDrawDeckCard->OnEndCursorOver.RemoveDynamic(this, &UPDCardActorManager::OnEndCursorOverDrawDeck);
+        TopDrawDeckCard->OnBeginCursorOver.RemoveDynamic(this, &APDCardActorManager::OnBeginCursorOverDrawDeck);
+        TopDrawDeckCard->OnEndCursorOver.RemoveDynamic(this, &APDCardActorManager::OnEndCursorOverDrawDeck);
 
         TopDrawDeckCard->Destroy();
 
@@ -116,7 +161,7 @@ void UPDCardActorManager::OnPlayerDrawDeckSizeChanged(const UObject* EventData)
     }
 }
 
-void UPDCardActorManager::OnPlayerDiscardPileChanged(const UObject* EventData)
+void APDCardActorManager::OnPlayerDiscardPileChanged(const UObject* EventData)
 {
     const UPDPlayerDiscardPileChangedEvent* PlayerDiscardPileChangedEvent = Cast<UPDPlayerDiscardPileChangedEvent>(EventData);
 
@@ -159,15 +204,15 @@ void UPDCardActorManager::OnPlayerDiscardPileChanged(const UObject* EventData)
             }
             else
             {
-                CardActor->OnBeginCursorOver.AddDynamic(this, &UPDCardActorManager::OnBeginCursorOverDiscardPile);
-                CardActor->OnEndCursorOver.AddDynamic(this, &UPDCardActorManager::OnEndCursorOverDiscardPile);
-                CardActor->OnClicked.AddDynamic(this, &UPDCardActorManager::OnClickedDiscardPile);
+                CardActor->OnBeginCursorOver.AddDynamic(this, &APDCardActorManager::OnBeginCursorOverDiscardPile);
+                CardActor->OnEndCursorOver.AddDynamic(this, &APDCardActorManager::OnEndCursorOverDiscardPile);
+                CardActor->OnClicked.AddDynamic(this, &APDCardActorManager::OnClickedDiscardPile);
             }
         }
     }
 }
 
-void UPDCardActorManager::OnPlayerHandChanged(const UObject* EventData)
+void APDCardActorManager::OnPlayerHandChanged(const UObject* EventData)
 {
     const UPDPlayerHandChangedEvent* PlayerHandChangedEvent = Cast<UPDPlayerHandChangedEvent>(EventData);
 
@@ -209,7 +254,7 @@ void UPDCardActorManager::OnPlayerHandChanged(const UObject* EventData)
     }
 }
 
-void UPDCardActorManager::OnCardPlayed(const UObject* EventData)
+void APDCardActorManager::OnCardPlayed(const UObject* EventData)
 {
     const UPDCardPlayedEvent* CardPlayedEvent = Cast<UPDCardPlayedEvent>(EventData);
 
@@ -233,7 +278,11 @@ void UPDCardActorManager::OnCardPlayed(const UObject* EventData)
 
     if (bIsLocationCard)
     {
-        CardActor->SetActorLocation(LocationCardLocation);
+        FPDCardAnimation CardAnimation;
+        CardAnimation.TargetLocation = LocationCardLocation;
+        CardAnimation.bShowSmallVersion = false;
+
+        QueueCardAnimation(CardActor, CardAnimation);
 
         if (IsValid(CurrentLocationCard))
         {
@@ -250,21 +299,27 @@ void UPDCardActorManager::OnCardPlayed(const UObject* EventData)
 
     if (bIsPlayerCard)
     {
-        CardActor->SetActorLocation(PlayerShipsStartLocation + LocalPlayerCards.Num() * PlayerShipsCardPadding);
-        CardActor->SetShowSmallVersion(true);
+        FPDCardAnimation CardAnimation;
+        CardAnimation.TargetLocation = PlayerShipsStartLocation + LocalPlayerCards.Num() * PlayerShipsCardPadding;
+        CardAnimation.bShowSmallVersion = true;
+
+        QueueCardAnimation(CardActor, CardAnimation);
 
         LocalPlayerCards.Add(CardActor);
         return;
     }
 
     // Must be enemy card.
-    CardActor->SetActorLocation(EnemyShipsStartLocation + EnemyCards.Num() * EnemyShipsCardPadding);
-    CardActor->SetShowSmallVersion(true);
+    FPDCardAnimation CardAnimation;
+    CardAnimation.TargetLocation = EnemyShipsStartLocation + EnemyCards.Num() * EnemyShipsCardPadding;
+    CardAnimation.bShowSmallVersion = true;
+
+    QueueCardAnimation(CardActor, CardAnimation);
 
     EnemyCards.Add(CardActor);
 }
 
-void UPDCardActorManager::OnStarshipAssigned(const UObject* EventData)
+void APDCardActorManager::OnStarshipAssigned(const UObject* EventData)
 {
     const UPDStarshipAssignedEvent* StarshipAssignedEvent = Cast<UPDStarshipAssignedEvent>(EventData);
 
@@ -297,7 +352,7 @@ void UPDCardActorManager::OnStarshipAssigned(const UObject* EventData)
     }
 }
 
-void UPDCardActorManager::OnStarshipDamaged(const UObject* EventData)
+void APDCardActorManager::OnStarshipDamaged(const UObject* EventData)
 {
     const UPDStarshipDamagedEvent* StarshipDamagedEvent = Cast<UPDStarshipDamagedEvent>(EventData);
 
@@ -339,7 +394,7 @@ void UPDCardActorManager::OnStarshipDamaged(const UObject* EventData)
     }
 }
 
-void UPDCardActorManager::OnCardRemoved(const UObject* EventData)
+void APDCardActorManager::OnCardRemoved(const UObject* EventData)
 {
     const UPDCardRemovedEvent* CardRemovedEvent = Cast<UPDCardRemovedEvent>(EventData);
     APDCardActor* RemovedCard = Cards.FindRef(CardRemovedEvent->EntityId);
@@ -352,12 +407,13 @@ void UPDCardActorManager::OnCardRemoved(const UObject* EventData)
         LocalPlayerCards.Remove(RemovedCard);
         EnemyCards.Remove(RemovedCard);
         DamageCards.Remove(RemovedCard);
+        NewCards.Remove(RemovedCard);
 
         RemovedCard->Destroy();
     }
 }
 
-void UPDCardActorManager::OnStarshipPowerChanged(const UObject* EventData)
+void APDCardActorManager::OnStarshipPowerChanged(const UObject* EventData)
 {
     const UPDStarshipPowerChangedEvent* StarshipPowerChangedEvent = Cast<UPDStarshipPowerChangedEvent>(EventData);
     APDCardActor* Card = Cards.FindRef(StarshipPowerChangedEvent->EntityId);
@@ -377,52 +433,66 @@ void UPDCardActorManager::OnStarshipPowerChanged(const UObject* EventData)
     PowerComponent->SetPowerModifier(StarshipPowerChangedEvent->NewPowerModifier);
 }
 
-void UPDCardActorManager::OnBeginCursorOver(AActor* TouchedActor)
+void APDCardActorManager::OnBeginCursorOver(AActor* TouchedActor)
 {
     OnCardHovered.Broadcast(Cast<APDCardActor>(TouchedActor));
 }
 
-void UPDCardActorManager::OnEndCursorOver(AActor* TouchedActor)
+void APDCardActorManager::OnEndCursorOver(AActor* TouchedActor)
 {
     OnCardUnhovered.Broadcast(Cast<APDCardActor>(TouchedActor));
 }
 
-void UPDCardActorManager::OnClicked(AActor* TouchedActor, FKey ButtonPressed)
+void APDCardActorManager::OnClicked(AActor* TouchedActor, FKey ButtonPressed)
 {
     OnCardClicked.Broadcast(Cast<APDCardActor>(TouchedActor));
 }
 
-void UPDCardActorManager::OnBeginCursorOverDrawDeck(AActor* TouchedActor)
+void APDCardActorManager::OnBeginCursorOverDrawDeck(AActor* TouchedActor)
 {
     OnDrawDeckHovered.Broadcast();
 }
 
-void UPDCardActorManager::OnEndCursorOverDrawDeck(AActor* TouchedActor)
+void APDCardActorManager::OnEndCursorOverDrawDeck(AActor* TouchedActor)
 {
     OnDrawDeckUnhovered.Broadcast();
 }
 
-void UPDCardActorManager::OnBeginCursorOverDiscardPile(AActor* TouchedActor)
+void APDCardActorManager::OnBeginCursorOverDiscardPile(AActor* TouchedActor)
 {
     OnDiscardPileHovered.Broadcast();
 }
 
-void UPDCardActorManager::OnEndCursorOverDiscardPile(AActor* TouchedActor)
+void APDCardActorManager::OnEndCursorOverDiscardPile(AActor* TouchedActor)
 {
     OnDiscardPileUnhovered.Broadcast();
 }
 
-void UPDCardActorManager::OnClickedDiscardPile(AActor* TouchedActor, FKey ButtonPressed)
+void APDCardActorManager::OnClickedDiscardPile(AActor* TouchedActor, FKey ButtonPressed)
 {
     OnDiscardPileClicked.Broadcast(DiscardPileCards);
 }
 
-void UPDCardActorManager::InitCardActor(APDCardActor* CardActor, int64 EntityId, const FString& CardId)
+void APDCardActorManager::InitCardActor(APDCardActor* CardActor, int64 EntityId, const FString& CardId)
 {
     CardActor->Init(EntityId, FName(CardId));
-    CardActor->OnBeginCursorOver.AddDynamic(this, &UPDCardActorManager::OnBeginCursorOver);
-    CardActor->OnEndCursorOver.AddDynamic(this, &UPDCardActorManager::OnEndCursorOver);
-    CardActor->OnClicked.AddDynamic(this, &UPDCardActorManager::OnClicked);
+    CardActor->OnBeginCursorOver.AddDynamic(this, &APDCardActorManager::OnBeginCursorOver);
+    CardActor->OnEndCursorOver.AddDynamic(this, &APDCardActorManager::OnEndCursorOver);
+    CardActor->OnClicked.AddDynamic(this, &APDCardActorManager::OnClicked);
 
     Cards.Add(EntityId, CardActor);
+}
+
+void APDCardActorManager::QueueCardAnimation(APDCardActor* CardActor, FPDCardAnimation CardAnimation)
+{
+    CardAnimation.AnimationDelay = 2.0f;
+    CardAnimation.AnimationDuration = 0.5f;
+    CardAnimation.AnimationTimeElapsed = 0.0f;
+    CardAnimation.StartLocation = CardActor->GetActorLocation();
+
+    CardActor->SetCardAnimation(CardAnimation);
+    NewCards.Add(CardActor);
+
+    CardActor->SetActorHiddenInGame(true);
+    CardActor->SetActorEnableCollision(false);
 }

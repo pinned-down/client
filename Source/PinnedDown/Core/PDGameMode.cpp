@@ -18,7 +18,7 @@
 APDGameMode::APDGameMode(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
     : Super(ObjectInitializer)
 {
-    CardActorManagerClass = UPDCardActorManager::StaticClass();
+    CardActorManagerClass = APDCardActorManager::StaticClass();
 }
 
 void APDGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -30,7 +30,7 @@ void APDGameMode::InitGame(const FString& MapName, const FString& Options, FStri
 
     EventManager = UDIContext->Construct<UPDEventManager>();
 
-    CardActorManager = UDIContext->Construct<UPDCardActorManager>(CardActorManagerClass);
+    CardActorManager = UDIContext->Spawn<APDCardActorManager>(GetWorld(), CardActorManagerClass);
     CardActorManager->Init();
 
     GameplayTagsManager = UDIContext->Construct<UPDGameplayTagsManager>();
@@ -98,7 +98,7 @@ UPDEventManager* APDGameMode::GetEventManager() const
     return EventManager;
 }
 
-UPDCardActorManager* APDGameMode::GetCardActorManager() const
+APDCardActorManager* APDGameMode::GetCardActorManager() const
 {
     return CardActorManager;
 }
