@@ -5,6 +5,14 @@ TArray<FString> UPDGameplayTagsComponent::GetInitialGameplayTags() const
     return InitialGameplayTags;
 }
 
+TArray<FString> UPDGameplayTagsComponent::GetGameplayTags() const
+{
+    TArray<FString> Tags;
+    Tags.Append(InitialGameplayTags);
+    Tags.Append(GlobalGameplayTags);
+    return Tags;
+}
+
 EPDCardType UPDGameplayTagsComponent::GetCardType() const
 {
     for (const FString& TagName : InitialGameplayTags)

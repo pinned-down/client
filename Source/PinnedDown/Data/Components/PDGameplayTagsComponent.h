@@ -19,6 +19,9 @@ public:
     TArray<FString> GetInitialGameplayTags() const;
 
     UFUNCTION(BlueprintPure)
+    TArray<FString> GetGameplayTags() const;
+
+    UFUNCTION(BlueprintPure)
     EPDCardType GetCardType() const;
 
     UFUNCTION(BlueprintPure)
@@ -27,4 +30,7 @@ public:
 private:
     UPROPERTY(VisibleAnywhere)
     TArray<FString> InitialGameplayTags;
+
+    UPROPERTY(VisibleAnywhere)
+    TArray<FString> GlobalGameplayTags;
 };
