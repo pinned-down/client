@@ -35,6 +35,9 @@ public:
     UFUNCTION(BlueprintCallable)
     void ServerPlayEffect(const FString& EffectCardId, int64 TargetEntityId);
 
+    UFUNCTION(BlueprintCallable)
+    void ServerPlayStarship(const FString& StarshipCardId);
+
 private:
     UPROPERTY()
     UPDUIMode* UIMode;

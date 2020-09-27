@@ -11,6 +11,7 @@
 #include "Data/Components/PDGameplayTagsComponent.h"
 #include "Data/Components/PDOwnerComponent.h"
 #include "Data/Components/PDPowerComponent.h"
+#include "Data/Components/PDThreatComponent.h"
 #include "Events/PDEventManager.h"
 #include "Events/EventData/PDCardPlayedEvent.h"
 #include "Events/EventData/PDCardRemovedEvent.h"
@@ -20,6 +21,7 @@
 #include "Events/EventData/PDStarshipAssignedEvent.h"
 #include "Events/EventData/PDStarshipDamagedEvent.h"
 #include "Events/EventData/PDStarshipPowerChangedEvent.h"
+#include "Events/EventData/PDThreatModifiersChangedEvent.h"
 #include "UI/PDCardAnimation.h"
 
 APDCardActorManager::APDCardActorManager(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -56,6 +58,9 @@ void APDCardActorManager::Init()
 
     PDCreateDynamicDelegate(FPDEventListenerSignature, OnPlayerDiscardPileChanged, &APDCardActorManager::OnPlayerDiscardPileChanged);
     EventManager->AddListener(TEXT("PDPlayerDiscardPileChangedEvent"), OnPlayerDiscardPileChanged);
+
+    PDCreateDynamicDelegate(FPDEventListenerSignature, ThreatModifiersChanged, &APDCardActorManager::NotifyOnThreatModifiersChanged);
+    EventManager->AddListener(TEXT("PDThreatModifiersChangedEvent"), ThreatModifiersChanged);
 }
 
 void APDCardActorManager::Tick(float DeltaSeconds)
@@ -103,6 +108,15 @@ void APDCardActorManager::Tick(float DeltaSeconds)
 APDCardActor* APDCardActorManager::GetCardActor(int64 EntityId) const
 {
     return Cards.FindRef(EntityId);
+}
+
+int32 APDCardActorManager::GetCardThreat(APDCardActor* CardActor) const
+{
+    UPDThreatComponent* ThreatComponent = CardActor->FindComponentByClass<UPDThreatComponent>();
+    int32 CardThreat = IsValid(ThreatComponent) ? ThreatComponent->GetThreat() : 0;
+    int32 ThreatModifier = ThreatModifiers.FindRef(CardActor->GetCardId().ToString());
+
+    return CardThreat + ThreatModifier;
 }
 
 void APDCardActorManager::OnPlayerDrawDeckSizeChanged(const UObject* EventData)
@@ -431,6 +445,14 @@ void APDCardActorManager::OnStarshipPowerChanged(const UObject* EventData)
     }
 
     PowerComponent->SetPowerModifier(StarshipPowerChangedEvent->NewPowerModifier);
+}
+
+void APDCardActorManager::NotifyOnThreatModifiersChanged(const UObject* EventData)
+{
+    const UPDThreatModifiersChangedEvent* ThreatModifiersChangedEvent = Cast<UPDThreatModifiersChangedEvent>(EventData);
+    ThreatModifiers = ThreatModifiersChangedEvent->ThreatModifiers;
+
+    OnThreatModifiersChanged.Broadcast();
 }
 
 void APDCardActorManager::OnBeginCursorOver(AActor* TouchedActor)

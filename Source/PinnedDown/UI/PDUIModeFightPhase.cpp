@@ -1,44 +1,19 @@
 #include "PDUIModeFightPhase.h"
 
-#include "Kismet/GameplayStatics.h"
-
 #include "Core/PDCardActor.h"
 #include "Core/PDGameplayTagsManager.h"
-#include "Core/PDLog.h"
 #include "Core/PDPlayerController.h"
 #include "Data/PDAbility.h"
 #include "Data/PDAbilityTargetType.h"
 #include "Data/Components/PDAbilitiesComponent.h"
 #include "Data/Components/PDAssignmentComponent.h"
-#include "Data/Components/PDGameplayTagsComponent.h"
+
 #include "Data/Components/PDOwnerComponent.h"
-
-void UPDUIModeFightPhase::HandleCardClicked(APDCardActor* ClickedActor)
-{
-    Super::HandleCardClicked(ClickedActor);
-
-    // Check clicked card type.
-    UPDGameplayTagsComponent* GameplayTagsComponent = ClickedActor->FindComponentByClass<UPDGameplayTagsComponent>();
-
-    if (!IsValid(GameplayTagsComponent))
-    {
-        return;
-    }
-
-    switch (GameplayTagsComponent->GetCardType())
-    {
-    case EPDCardType::CARDTYPE_Starship:
-        HandleStarshipClicked(ClickedActor);
-        break;
-
-    case EPDCardType::CARDTYPE_Effect:
-        HandleEffectClicked(ClickedActor);
-        break;
-    }
-}
 
 void UPDUIModeFightPhase::HandleStarshipClicked(APDCardActor* ClickedActor)
 {
+    Super::HandleStarshipClicked(ClickedActor);
+
     if (IsValid(EffectToPickTargetFor))
     {
         UPDAbilitiesComponent* AbilitiesComponent = EffectToPickTargetFor->FindComponentByClass<UPDAbilitiesComponent>();
@@ -84,6 +59,8 @@ void UPDUIModeFightPhase::HandleStarshipClicked(APDCardActor* ClickedActor)
 
 void UPDUIModeFightPhase::HandleEffectClicked(APDCardActor* ClickedActor)
 {
+    Super::HandleEffectClicked(ClickedActor);
+
     UPDAbilitiesComponent* AbilitiesComponent = ClickedActor->FindComponentByClass<UPDAbilitiesComponent>();
 
     if (!IsValid(AbilitiesComponent))
@@ -96,7 +73,7 @@ void UPDUIModeFightPhase::HandleEffectClicked(APDCardActor* ClickedActor)
 
     for (const FPDAbility& Ability : AbilitiesComponent->GetAbilities())
     {
-        if (GameplayTagsManager->HasAllGlobalTags(Ability.RequiredTags))
+        if (GetGameplayTagsManager()->HasAllGlobalTags(Ability.RequiredTags))
         {
             bMeetsRequiredTags = true;
             AbilityTargetType = Ability.GetTargetType();

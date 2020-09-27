@@ -27,6 +27,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerLocationCardHoveredSignatu
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerLocationCardUnhoveredSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerLocationCardClickedSignature, const TArray<APDCardActor*>&, LocationCards);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerThreatModifiersChangedSignature);
+
 UCLASS(BlueprintType, Blueprintable, meta=(Inject))
 class PINNEDDOWN_API APDCardActorManager : public AActor
 {
@@ -40,6 +42,9 @@ public:
 
     UFUNCTION(BlueprintPure)
     APDCardActor* GetCardActor(int64 EntityId) const;
+
+    UFUNCTION(BlueprintPure)
+    int32 GetCardThreat(APDCardActor* CardActor) const;
 
     UPROPERTY(BlueprintAssignable)
     FPDCardActorManagerCardHoveredSignature OnCardHovered;
@@ -73,6 +78,9 @@ public:
 
     UPROPERTY(BlueprintAssignable)
     FPDCardActorManagerLocationCardClickedSignature OnLocationCardClicked;
+
+    UPROPERTY(BlueprintAssignable)
+    FPDCardActorManagerThreatModifiersChangedSignature OnThreatModifiersChanged;
 
 private:
     UPROPERTY(EditDefaultsOnly)
@@ -147,6 +155,8 @@ private:
     UPROPERTY()
     TArray<APDCardActor*> NewCards;
 
+    TMap<FString, int32> ThreatModifiers;
+
     UFUNCTION()
     void OnPlayerDrawDeckSizeChanged(const UObject* EventData);
 
@@ -170,6 +180,9 @@ private:
 
     UFUNCTION()
     void OnStarshipPowerChanged(const UObject* EventData);
+
+    UFUNCTION()
+    void NotifyOnThreatModifiersChanged(const UObject* EventData);
 
     UFUNCTION()
     void OnBeginCursorOver(AActor* TouchedActor);

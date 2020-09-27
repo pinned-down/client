@@ -16,12 +16,14 @@
 #include "Events/EventData/PDEndMainPhaseAction.h"
 #include "Events/EventData/PDPlayerEntityCreatedEvent.h"
 #include "Events/EventData/PDPlayEffectAction.h"
+#include "Events/EventData/PDPlayStarshipAction.h"
 #include "Events/EventData/PDResolveFightAction.h"
 #include "Events/EventData/PDTurnPhaseStartedEvent.h"
 #include "Online/Auth/PDAuthService.h"
 #include "UI/PDUIMode.h"
 #include "UI/PDUIModeAssignmentPhase.h"
 #include "UI/PDUIModeFightPhase.h"
+#include "UI/PDUIModeMainPhase.h"
 
 void APDPlayerController::BeginPlay()
 {
@@ -99,6 +101,13 @@ void APDPlayerController::ServerPlayEffect(const FString& EffectCardId, int64 Ta
     SendActionToServer(Action);
 }
 
+void APDPlayerController::ServerPlayStarship(const FString& StarshipCardId)
+{
+    UPDPlayStarshipAction* Action = NewObject<UPDPlayStarshipAction>(this);
+    Action->BlueprintId = StarshipCardId;
+    SendActionToServer(Action);
+}
+
 void APDPlayerController::OnPlayerEntityCreated(const UObject* EventData)
 {
     const UPDPlayerEntityCreatedEvent* PlayerEntityCreatedEvent = Cast<UPDPlayerEntityCreatedEvent>(EventData);
@@ -147,17 +156,27 @@ void APDPlayerController::OnTurnPhaseStarted(const UObject* EventData)
         return;
     }
 
-    if (TurnPhasedStartedEvent->GetTurnPhase() == EPDTurnPhase::TURNPHASE_Assignment)
+    switch (TurnPhasedStartedEvent->GetTurnPhase())
     {
-        SetUIMode(UDIContext->Construct<UPDUIModeAssignmentPhase>());
-    }
-    else if (TurnPhasedStartedEvent->GetTurnPhase() == EPDTurnPhase::TURNPHASE_Fight)
-    {
-        SetUIMode(UDIContext->Construct<UPDUIModeFightPhase>());
-    }
-    else if (TurnPhasedStartedEvent->GetTurnPhase() == EPDTurnPhase::TURNPHASE_Jump)
-    {
+    case EPDTurnPhase::TURNPHASE_Main:
+        SetUIMode(UDIContext->Construct<UPDUIModeMainPhase>());
+        break;
+
+    case EPDTurnPhase::TURNPHASE_Attack:
         SetUIMode(nullptr);
+        break;
+
+    case EPDTurnPhase::TURNPHASE_Assignment:
+        SetUIMode(UDIContext->Construct<UPDUIModeAssignmentPhase>());
+        break;
+
+    case EPDTurnPhase::TURNPHASE_Fight:
+        SetUIMode(UDIContext->Construct<UPDUIModeFightPhase>());
+        break;
+
+    case EPDTurnPhase::TURNPHASE_Jump:
+        SetUIMode(nullptr);
+        break;
     }
 }
 
