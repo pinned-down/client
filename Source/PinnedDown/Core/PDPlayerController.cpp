@@ -14,6 +14,7 @@
 #include "Events/EventData/PDAssignStarshipAction.h"
 #include "Events/EventData/PDEndAssignmentPhaseAction.h"
 #include "Events/EventData/PDEndMainPhaseAction.h"
+#include "Events/EventData/PDErrorEvent.h"
 #include "Events/EventData/PDPlayerEntityCreatedEvent.h"
 #include "Events/EventData/PDPlayEffectAction.h"
 #include "Events/EventData/PDPlayStarshipAction.h"
@@ -52,6 +53,9 @@ void APDPlayerController::BeginPlay()
 
     PDCreateDynamicDelegate(FPDEventListenerSignature, OnTurnPhaseStarted, &APDPlayerController::OnTurnPhaseStarted);
     EventManager->AddListener(TEXT("PDTurnPhaseStartedEvent"), OnTurnPhaseStarted);
+
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnError, &APDPlayerController::OnError);
+    EventManager->AddListener(TEXT("PDErrorEvent"), OnError);
 
     APDCardActorManager* CardActorManager = GameMode->GetCardActorManager();
 
@@ -106,6 +110,11 @@ void APDPlayerController::ServerPlayStarship(const FString& StarshipCardId)
     UPDPlayStarshipAction* Action = NewObject<UPDPlayStarshipAction>(this);
     Action->BlueprintId = StarshipCardId;
     SendActionToServer(Action);
+}
+
+void APDPlayerController::NotifyOnError(const FString& ErrorCode, const FText& ErrorMessage)
+{
+    ReceiveOnError(ErrorCode, ErrorMessage);
 }
 
 void APDPlayerController::OnPlayerEntityCreated(const UObject* EventData)
@@ -180,6 +189,20 @@ void APDPlayerController::OnTurnPhaseStarted(const UObject* EventData)
     }
 }
 
+void APDPlayerController::OnError(const UObject* EventData)
+{
+    const UPDErrorEvent* ErrorEvent = Cast<UPDErrorEvent>(EventData);
+
+    if (!SentActionIds.Remove(ErrorEvent->ActionId))
+    {
+        return;
+    }
+
+    FText ErrorMessage = FText::FromStringTable(ErrorLocalizationTableId, ErrorEvent->ErrorCode);
+
+    NotifyOnError(ErrorEvent->ErrorCode, ErrorMessage);
+}
+
 void APDPlayerController::OnCardClicked(APDCardActor* ClickedActor)
 {
     if (IsValid(UIMode))
@@ -196,6 +219,10 @@ void APDPlayerController::SendActionToServer(UPDAction* Action)
     {
         return;
     }
+
+    // Assign action id.
+    Action->ActionId = FGuid::NewGuid().ToString(EGuidFormats::Short);
+    SentActionIds.Add(Action->ActionId);
 
     GameMode->SendActionToServer(Action);
 }

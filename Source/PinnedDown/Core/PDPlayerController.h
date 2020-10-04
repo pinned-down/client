@@ -38,17 +38,30 @@ public:
     UFUNCTION(BlueprintCallable)
     void ServerPlayStarship(const FString& StarshipCardId);
 
+    virtual void NotifyOnError(const FString& ErrorCode, const FText& ErrorMessage);
+
+    UFUNCTION(BlueprintImplementableEvent)
+    void ReceiveOnError(const FString& ErrorCode, const FText& ErrorMessage);
+
 private:
+    UPROPERTY(EditDefaultsOnly)
+    FName ErrorLocalizationTableId;
+
     UPROPERTY()
     UPDUIMode* UIMode;
 
     int64 LocalPlayerEntityId;
+
+    TSet<FString> SentActionIds;
 
     UFUNCTION()
     void OnPlayerEntityCreated(const UObject* EventData);
 
     UFUNCTION()
     void OnTurnPhaseStarted(const UObject* EventData);
+
+    UFUNCTION()
+    void OnError(const UObject* EventData);
 
     UFUNCTION()
     void OnCardClicked(APDCardActor* ClickedActor);

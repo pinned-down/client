@@ -4,16 +4,17 @@
 
 #include "UObject/Object.h"
 
-#include "PDAction.generated.h"
+#include "PDErrorEvent.generated.h"
 
 UCLASS(BlueprintType)
-class PINNEDDOWN_API UPDAction : public UObject
+class PINNEDDOWN_API UPDErrorEvent : public UObject
 {
     GENERATED_BODY()
 
 public:
-    FString Endpoint;
-
     UPROPERTY(BlueprintReadWrite)
     FString ActionId;
+
+    UPROPERTY(BlueprintReadWrite)
+    FString ErrorCode;
 };
