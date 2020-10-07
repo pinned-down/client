@@ -5,7 +5,9 @@
 #include "Core/PDCardActor.h"
 #include "Core/PDDelegate.h"
 #include "Core/PDPlayerController.h"
+#include "Data/PDActiveAbilityEffect.h"
 #include "Data/PDCardType.h"
+#include "Data/Components/PDAbilityEffectsComponent.h"
 #include "Data/Components/PDAssignmentComponent.h"
 #include "Data/Components/PDAttachmentComponent.h"
 #include "Data/Components/PDGameplayTagsComponent.h"
@@ -13,6 +15,8 @@
 #include "Data/Components/PDPowerComponent.h"
 #include "Data/Components/PDThreatComponent.h"
 #include "Events/PDEventManager.h"
+#include "Events/EventData/PDAbilityEffectActivatedEvent.h"
+#include "Events/EventData/PDAbilityEffectDeactivatedEvent.h"
 #include "Events/EventData/PDCardPlayedEvent.h"
 #include "Events/EventData/PDCardRemovedEvent.h"
 #include "Events/EventData/PDPlayerDiscardPileChangedEvent.h"
@@ -61,6 +65,12 @@ void APDCardActorManager::Init()
 
     PDCreateDynamicDelegate(FPDEventListenerSignature, ThreatModifiersChanged, &APDCardActorManager::NotifyOnThreatModifiersChanged);
     EventManager->AddListener(TEXT("PDThreatModifiersChangedEvent"), ThreatModifiersChanged);
+
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnAbilityEffectActivated, &APDCardActorManager::OnAbilityEffectActivated);
+    EventManager->AddListener(TEXT("PDAbilityEffectActivatedEvent"), OnAbilityEffectActivated);
+
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnAbilityEffectDeactivated, &APDCardActorManager::OnAbilityEffectDeactivated);
+    EventManager->AddListener(TEXT("PDAbilityEffectDeactivatedEvent"), OnAbilityEffectDeactivated);
 }
 
 void APDCardActorManager::Tick(float DeltaSeconds)
@@ -453,6 +463,51 @@ void APDCardActorManager::NotifyOnThreatModifiersChanged(const UObject* EventDat
     ThreatModifiers = ThreatModifiersChangedEvent->ThreatModifiers;
 
     OnThreatModifiersChanged.Broadcast();
+}
+
+void APDCardActorManager::OnAbilityEffectActivated(const UObject* EventData)
+{
+    const UPDAbilityEffectActivatedEvent* AbilityEffectActivatedEvent = Cast<UPDAbilityEffectActivatedEvent>(EventData);
+    APDCardActor* EffectTarget = GetCardActor(AbilityEffectActivatedEvent->TargetEntityId);
+
+    if (!IsValid(EffectTarget))
+    {
+        return;
+    }
+
+    UPDAbilityEffectsComponent* AbilityEffectsComponent = EffectTarget->FindComponentByClass<UPDAbilityEffectsComponent>();
+
+    if (!IsValid(AbilityEffectsComponent))
+    {
+        return;
+    }
+
+    FPDActiveAbilityEffect NewEffect;
+    NewEffect.EffectEntityId = AbilityEffectActivatedEvent->EffectEntityId;
+    NewEffect.EffectId = FName(*AbilityEffectActivatedEvent->EffectBlueprintId);
+    NewEffect.AbilityId = FName(*AbilityEffectActivatedEvent->AbilityBlueprintId);
+
+    AbilityEffectsComponent->AddActiveEffect(NewEffect.EffectEntityId, NewEffect);
+}
+
+void APDCardActorManager::OnAbilityEffectDeactivated(const UObject* EventData)
+{
+    const UPDAbilityEffectDeactivatedEvent* AbilityEffectDeactivatedEvent = Cast<UPDAbilityEffectDeactivatedEvent>(EventData);
+    APDCardActor* EffectTarget = GetCardActor(AbilityEffectDeactivatedEvent->TargetEntityId);
+
+    if (!IsValid(EffectTarget))
+    {
+        return;
+    }
+
+    UPDAbilityEffectsComponent* AbilityEffectsComponent = EffectTarget->FindComponentByClass<UPDAbilityEffectsComponent>();
+
+    if (!IsValid(AbilityEffectsComponent))
+    {
+        return;
+    }
+
+    AbilityEffectsComponent->RemoveActiveEffect(AbilityEffectDeactivatedEvent->EffectEntityId);
 }
 
 void APDCardActorManager::OnBeginCursorOver(AActor* TouchedActor)

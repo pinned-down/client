@@ -185,6 +185,12 @@ private:
     void NotifyOnThreatModifiersChanged(const UObject* EventData);
 
     UFUNCTION()
+    void OnAbilityEffectActivated(const UObject* EventData);
+
+    UFUNCTION()
+    void OnAbilityEffectDeactivated(const UObject* EventData);
+
+    UFUNCTION()
     void OnBeginCursorOver(AActor* TouchedActor);
 
     UFUNCTION()
