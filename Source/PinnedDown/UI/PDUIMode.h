@@ -10,6 +10,8 @@ class APDCardActor;
 class UPDGameplayTagsManager;
 class APDPlayerController;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDUIModeHintChangedSignature, const FText&, Hint);
+
 UCLASS(BlueprintType)
 class PINNEDDOWN_API UPDUIMode : public UObject
 {
@@ -22,9 +24,14 @@ public:
     UPDGameplayTagsManager* GetGameplayTagsManager() const;
     APDPlayerController* GetPlayerController() const;
 
+    UPROPERTY(BlueprintAssignable)
+    FPDUIModeHintChangedSignature OnHintChanged;
+
 protected:
     virtual void HandleEffectClicked(APDCardActor* ClickedActor);
     virtual void HandleStarshipClicked(APDCardActor* ClickedActor);
+
+    virtual void NotifyOnHintChanged(const FText& Hint);
 
 private:
     UPROPERTY(meta = (Inject))

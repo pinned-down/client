@@ -4,6 +4,13 @@
 #include "Core/PDPlayerController.h"
 #include "Data/Components/PDOwnerComponent.h"
 
+void UPDUIModeAssignmentPhase::Init(APDPlayerController* InPlayerController)
+{
+    Super::Init(InPlayerController);
+
+    OnHintChanged.Broadcast(NSLOCTEXT("PinnedDown", "UIMode.AssignmentPhase.Assign", "Select a starship to assign to an enemy!"));
+}
+
 void UPDUIModeAssignmentPhase::HandleCardClicked(APDCardActor* ClickedActor)
 {
     Super::HandleCardClicked(ClickedActor);
@@ -16,6 +23,8 @@ void UPDUIModeAssignmentPhase::HandleCardClicked(APDCardActor* ClickedActor)
         if (GetPlayerController()->IsLocalPlayer(OwnerComponent->GetOwnerEntityId()))
         {
             SelectedPlayerCard = ClickedActor;
+
+            OnHintChanged.Broadcast(NSLOCTEXT("PinnedDown", "UIMode.AssignmentPhase.AssignTo", "Select an enemy starship to assign your starship to!"));
         }
     }
     else
@@ -29,6 +38,8 @@ void UPDUIModeAssignmentPhase::HandleCardClicked(APDCardActor* ClickedActor)
             GetPlayerController()->ServerAssignStarship(SelectedPlayerCard->GetEntityId(), ClickedActor->GetEntityId());
 
             SelectedPlayerCard = nullptr;
+
+            OnHintChanged.Broadcast(NSLOCTEXT("PinnedDown", "UIMode.AssignmentPhase.Assign", "Select a starship to assign to an enemy!"));
         }
     }
 }

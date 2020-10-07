@@ -117,6 +117,11 @@ void APDPlayerController::NotifyOnError(const FString& ErrorCode, const FText& E
     ReceiveOnError(ErrorCode, ErrorMessage);
 }
 
+void APDPlayerController::NotifyOnHintChanged(const FText& Hint)
+{
+    ReceiveOnHintChanged(Hint);
+}
+
 void APDPlayerController::OnPlayerEntityCreated(const UObject* EventData)
 {
     const UPDPlayerEntityCreatedEvent* PlayerEntityCreatedEvent = Cast<UPDPlayerEntityCreatedEvent>(EventData);
@@ -211,6 +216,11 @@ void APDPlayerController::OnCardClicked(APDCardActor* ClickedActor)
     }
 }
 
+void APDPlayerController::OnHintChanged(const FText& Hint)
+{
+    NotifyOnHintChanged(Hint);
+}
+
 void APDPlayerController::SendActionToServer(UPDAction* Action)
 {
     APDGameMode* GameMode = Cast<APDGameMode>(UGameplayStatics::GetGameMode(this));
@@ -229,10 +239,19 @@ void APDPlayerController::SendActionToServer(UPDAction* Action)
 
 void APDPlayerController::SetUIMode(UPDUIMode* NewUIMode)
 {
-    UIMode = NewUIMode;
-
     if (IsValid(UIMode))
     {
+        UIMode->OnHintChanged.RemoveDynamic(this, &APDPlayerController::OnHintChanged);
+    }
+
+    OnHintChanged(FText::GetEmpty());
+
+    UIMode = NewUIMode;
+    
+    if (IsValid(UIMode))
+    {
+        UIMode->OnHintChanged.AddDynamic(this, &APDPlayerController::OnHintChanged);
+
         UIMode->Init(this);
     }
 }

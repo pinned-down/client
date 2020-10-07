@@ -39,9 +39,13 @@ public:
     void ServerPlayStarship(const FString& StarshipCardId);
 
     virtual void NotifyOnError(const FString& ErrorCode, const FText& ErrorMessage);
+    virtual void NotifyOnHintChanged(const FText& Hint);
 
-    UFUNCTION(BlueprintImplementableEvent)
+    UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnError"))
     void ReceiveOnError(const FString& ErrorCode, const FText& ErrorMessage);
+
+    UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnHintChanged"))
+    void ReceiveOnHintChanged(const FText& Hint);
 
 private:
     UPROPERTY(EditDefaultsOnly)
@@ -65,6 +69,9 @@ private:
 
     UFUNCTION()
     void OnCardClicked(APDCardActor* ClickedActor);
+
+    UFUNCTION()
+    void OnHintChanged(const FText& Hint);
 
     void SendActionToServer(UPDAction* Action);
     void SetUIMode(UPDUIMode* NewUIMode);

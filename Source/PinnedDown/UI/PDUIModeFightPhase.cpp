@@ -10,6 +10,13 @@
 
 #include "Data/Components/PDOwnerComponent.h"
 
+void UPDUIModeFightPhase::Init(APDPlayerController* InPlayerController)
+{
+    Super::Init(InPlayerController);
+
+    OnHintChanged.Broadcast(NSLOCTEXT("PinnedDown", "UIMode.FightPhase.ChooseAction", "Click on a starship to resolve its fight, or select an effect from hand to play!"));
+}
+
 void UPDUIModeFightPhase::HandleStarshipClicked(APDCardActor* ClickedActor)
 {
     Super::HandleStarshipClicked(ClickedActor);
@@ -34,6 +41,8 @@ void UPDUIModeFightPhase::HandleStarshipClicked(APDCardActor* ClickedActor)
         }
 
         EffectToPickTargetFor = nullptr;
+
+        OnHintChanged.Broadcast(NSLOCTEXT("PinnedDown", "UIMode.FightPhase.ChooseAction", "Click on a starship to resolve its fight, or select an effect from hand to play!"));
         return;
     }
 
@@ -89,5 +98,7 @@ void UPDUIModeFightPhase::HandleEffectClicked(APDCardActor* ClickedActor)
     if (AbilityTargetType == EPDAbilityTargetType::TARGETTYPE_Starship)
     {
         EffectToPickTargetFor = ClickedActor;
+
+        OnHintChanged.Broadcast(NSLOCTEXT("PinnedDown", "UIMode.FightPhase.SelectEffectTarget", "Select a target!"));
     }
 }

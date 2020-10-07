@@ -48,3 +48,8 @@ void UPDUIMode::HandleEffectClicked(APDCardActor* ClickedActor)
 void UPDUIMode::HandleStarshipClicked(APDCardActor* ClickedActor)
 {
 }
+
+void UPDUIMode::NotifyOnHintChanged(const FText& Hint)
+{
+    OnHintChanged.Broadcast(Hint);
+}

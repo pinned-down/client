@@ -13,6 +13,9 @@ class PINNEDDOWN_API UPDUIModeFightPhase : public UPDUIMode
 {
     GENERATED_BODY()
 
+public:
+    virtual void Init(APDPlayerController* InPlayerController) override;
+
 protected:
     void HandleStarshipClicked(APDCardActor* ClickedActor) override;
     void HandleEffectClicked(APDCardActor* ClickedActor) override;
