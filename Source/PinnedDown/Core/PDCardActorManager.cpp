@@ -488,6 +488,9 @@ void APDCardActorManager::OnAbilityEffectActivated(const UObject* EventData)
     NewEffect.AbilityId = FName(*AbilityEffectActivatedEvent->AbilityBlueprintId);
 
     AbilityEffectsComponent->AddActiveEffect(NewEffect.EffectEntityId, NewEffect);
+
+    // Notify listeners.
+    OnActiveAbilityEffectsChanged.Broadcast(EffectTarget);
 }
 
 void APDCardActorManager::OnAbilityEffectDeactivated(const UObject* EventData)
@@ -508,6 +511,9 @@ void APDCardActorManager::OnAbilityEffectDeactivated(const UObject* EventData)
     }
 
     AbilityEffectsComponent->RemoveActiveEffect(AbilityEffectDeactivatedEvent->EffectEntityId);
+
+    // Notify listeners.
+    OnActiveAbilityEffectsChanged.Broadcast(EffectTarget);
 }
 
 void APDCardActorManager::OnBeginCursorOver(AActor* TouchedActor)

@@ -28,6 +28,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerLocationCardUnhoveredSigna
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerLocationCardClickedSignature, const TArray<APDCardActor*>&, LocationCards);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerThreatModifiersChangedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerActiveAbilityEffectsChangedSignature, APDCardActor*, CardActor);
 
 UCLASS(BlueprintType, Blueprintable, meta=(Inject))
 class PINNEDDOWN_API APDCardActorManager : public AActor
@@ -81,6 +82,9 @@ public:
 
     UPROPERTY(BlueprintAssignable)
     FPDCardActorManagerThreatModifiersChangedSignature OnThreatModifiersChanged;
+
+    UPROPERTY(BlueprintAssignable)
+    FPDCardActorManagerActiveAbilityEffectsChangedSignature OnActiveAbilityEffectsChanged;
 
 private:
     UPROPERTY(EditDefaultsOnly)
