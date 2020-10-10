@@ -129,6 +129,9 @@ private:
     UPROPERTY(EditDefaultsOnly)
     FVector DiscardPileLocation;
 
+    UPROPERTY(EditDefaultsOnly)
+    FVector PlayedCardLocation;
+
     UPROPERTY(meta=(Inject))
     UPDEventManager* EventManager;
 

@@ -583,6 +583,8 @@ void APDCardActorManager::InitCardActor(APDCardActor* CardActor, int64 EntityId,
 
 void APDCardActorManager::QueueCardAnimation(APDCardActor* CardActor, FPDCardAnimation CardAnimation)
 {
+    CardActor->SetActorLocation(PlayedCardLocation);
+
     CardAnimation.AnimationDelay = 2.0f;
     CardAnimation.AnimationDuration = 0.5f;
     CardAnimation.AnimationTimeElapsed = 0.0f;
