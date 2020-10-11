@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 
 #include "Core/PDCardActor.h"
+#include "Data/PDBattleDestiny.h"
 #include "UI/PDCardAnimation.h"
 
 #include "PDCardActorManager.generated.h"
@@ -29,6 +30,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerLocationCardClick
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerThreatModifiersChangedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerActiveAbilityEffectsChangedSignature, APDCardActor*, CardActor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerBattleDestinyCardRevealedSignature, FPDBattleDestiny, BattleDestiny);
 
 UCLASS(BlueprintType, Blueprintable, meta=(Inject))
 class PINNEDDOWN_API APDCardActorManager : public AActor
@@ -85,6 +87,9 @@ public:
 
     UPROPERTY(BlueprintAssignable)
     FPDCardActorManagerActiveAbilityEffectsChangedSignature OnActiveAbilityEffectsChanged;
+
+    UPROPERTY(BlueprintAssignable)
+    FPDCardActorManagerBattleDestinyCardRevealedSignature OnBattleDestinyCardRevealed;
 
 private:
     UPROPERTY(EditDefaultsOnly)
@@ -196,6 +201,9 @@ private:
 
     UFUNCTION()
     void OnAbilityEffectDeactivated(const UObject* EventData);
+
+    UFUNCTION()
+    void OnBattleDestinyDrawn(const UObject* EventData);
 
     UFUNCTION()
     void OnBeginCursorOver(AActor* TouchedActor);

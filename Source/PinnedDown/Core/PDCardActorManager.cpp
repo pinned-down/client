@@ -17,6 +17,7 @@
 #include "Events/PDEventManager.h"
 #include "Events/EventData/PDAbilityEffectActivatedEvent.h"
 #include "Events/EventData/PDAbilityEffectDeactivatedEvent.h"
+#include "Events/EventData/PDBattleDestinyDrawnEvent.h"
 #include "Events/EventData/PDCardPlayedEvent.h"
 #include "Events/EventData/PDCardRemovedEvent.h"
 #include "Events/EventData/PDPlayerDiscardPileChangedEvent.h"
@@ -71,6 +72,9 @@ void APDCardActorManager::Init()
 
     PDCreateDynamicDelegate(FPDEventListenerSignature, OnAbilityEffectDeactivated, &APDCardActorManager::OnAbilityEffectDeactivated);
     EventManager->AddListener(TEXT("PDAbilityEffectDeactivatedEvent"), OnAbilityEffectDeactivated);
+
+    PDCreateDynamicDelegate(FPDEventListenerSignature, OnBattleDestinyDrawn, &APDCardActorManager::OnBattleDestinyDrawn);
+    EventManager->AddListener(TEXT("PDBattleDestinyDrawnEvent"), OnBattleDestinyDrawn);
 }
 
 void APDCardActorManager::Tick(float DeltaSeconds)
@@ -514,6 +518,32 @@ void APDCardActorManager::OnAbilityEffectDeactivated(const UObject* EventData)
 
     // Notify listeners.
     OnActiveAbilityEffectsChanged.Broadcast(EffectTarget);
+}
+
+void APDCardActorManager::OnBattleDestinyDrawn(const UObject* EventData)
+{
+    const UPDBattleDestinyDrawnEvent* BattleDestinyDrawnEvent = Cast<UPDBattleDestinyDrawnEvent>(EventData);
+
+    // Create card actor.
+    APDCardActor* CardActor = GetWorld()->SpawnActor<APDCardActor>(CardActorClass);
+
+    if (!IsValid(CardActor))
+    {
+        return;
+    }
+
+    InitCardActor(CardActor, 0L, BattleDestinyDrawnEvent->BattleDestinyCardBlueprintId);
+
+    CardActor->SetActorHiddenInGame(true);
+    CardActor->SetActorEnableCollision(false);
+
+    // Notify listeners.
+    FPDBattleDestiny BattleDestiny;
+    BattleDestiny.BattleDestiny = BattleDestinyDrawnEvent->BattleDestiny;
+    BattleDestiny.BattleDestinyCard = CardActor;
+    BattleDestiny.Target = GetCardActor(BattleDestinyDrawnEvent->TargetEntityId);
+
+    OnBattleDestinyCardRevealed.Broadcast(BattleDestiny);
 }
 
 void APDCardActorManager::OnBeginCursorOver(AActor* TouchedActor)
