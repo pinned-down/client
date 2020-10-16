@@ -35,6 +35,10 @@ EPDThreatChangeReason UPDThreatChangedEvent::GetThreatChangeReason() const
     {
         return EPDThreatChangeReason::THREATCHANGE_FleetSize;
     }
+    else if (Reason == TEXT("EFFECT"))
+    {
+        return EPDThreatChangeReason::THREATCHANGE_Effect;
+    }
 
     return EPDThreatChangeReason::THREATCHANGE_Unknown;
 }

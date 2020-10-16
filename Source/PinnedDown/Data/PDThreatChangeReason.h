@@ -15,4 +15,5 @@ enum class EPDThreatChangeReason : uint8
     THREATCHANGE_PlayerCardPlayed,
     THREATCHANGE_TotalDistance,
     THREATCHANGE_FleetSize,
+    THREATCHANGE_Effect
 };
