@@ -322,10 +322,7 @@ void APDCardActorManager::OnCardPlayed(const UObject* EventData)
     }
 
     // Check if player card.
-    APDPlayerController* PlayerController = Cast<APDPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
-    bool bIsPlayerCard = IsValid(PlayerController) && PlayerController->IsLocalPlayer(CardPlayedEvent->OwnerEntityId);
-
-    if (bIsPlayerCard)
+    if (IsLocalPlayerCard(CardActor))
     {
         FPDCardAnimation CardAnimation;
         CardAnimation.TargetLocation = PlayerShipsStartLocation + LocalPlayerCards.Num() * PlayerShipsCardPadding;
@@ -334,6 +331,17 @@ void APDCardActorManager::OnCardPlayed(const UObject* EventData)
         QueueCardAnimation(CardActor, CardAnimation);
 
         LocalPlayerCards.Add(CardActor);
+        return;
+    }
+    else if (IsPlayerCard(CardActor))
+    {
+        FPDCardAnimation CardAnimation;
+        CardAnimation.TargetLocation = AlliedShipsStartLocation + AlliedPlayerCards.Num() * PlayerShipsCardPadding;
+        CardAnimation.bShowSmallVersion = true;
+
+        QueueCardAnimation(CardActor, CardAnimation);
+
+        AlliedPlayerCards.Add(CardActor);
         return;
     }
 
@@ -373,9 +381,14 @@ void APDCardActorManager::OnStarshipAssigned(const UObject* EventData)
         FVector NewLocation = AssignedTo->GetActorLocation() + AssignedCardOffset;
         AssignedStarship->SetActorLocation(NewLocation);
     }
-    else
+    else if (IsLocalPlayerCard(AssignedStarship))
     {
         FVector NewLocation = PlayerShipsStartLocation + LocalPlayerCards.IndexOfByKey(AssignedStarship) * PlayerShipsCardPadding;
+        AssignedStarship->SetActorLocation(NewLocation);
+    }
+    else if (IsPlayerCard(AssignedStarship))
+    {
+        FVector NewLocation = AlliedShipsStartLocation + AlliedPlayerCards.IndexOfByKey(AssignedStarship) * PlayerShipsCardPadding;
         AssignedStarship->SetActorLocation(NewLocation);
     }
 }
@@ -433,6 +446,7 @@ void APDCardActorManager::OnCardRemoved(const UObject* EventData)
 
         HandCards.Remove(RemovedCard);
         LocalPlayerCards.Remove(RemovedCard);
+        AlliedPlayerCards.Remove(RemovedCard);
         EnemyCards.Remove(RemovedCard);
         DamageCards.Remove(RemovedCard);
         NewCards.Remove(RemovedCard);
@@ -625,4 +639,17 @@ void APDCardActorManager::QueueCardAnimation(APDCardActor* CardActor, FPDCardAni
 
     CardActor->SetActorHiddenInGame(true);
     CardActor->SetActorEnableCollision(false);
+}
+
+bool APDCardActorManager::IsPlayerCard(APDCardActor* CardActor) const
+{
+    UPDOwnerComponent* OwnerComponent = CardActor->FindComponentByClass<UPDOwnerComponent>();
+    return IsValid(OwnerComponent) && OwnerComponent->GetOwnerEntityId() > 0;
+}
+
+bool APDCardActorManager::IsLocalPlayerCard(APDCardActor* CardActor) const
+{
+    APDPlayerController* PlayerController = Cast<APDPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+    UPDOwnerComponent* OwnerComponent = CardActor->FindComponentByClass<UPDOwnerComponent>();
+    return IsValid(PlayerController) && IsValid(OwnerComponent) && PlayerController->IsLocalPlayer(OwnerComponent->GetOwnerEntityId());
 }

@@ -111,6 +111,9 @@ private:
     FVector PlayerShipsStartLocation;
 
     UPROPERTY(EditDefaultsOnly)
+    FVector AlliedShipsStartLocation;
+
+    UPROPERTY(EditDefaultsOnly)
     FVector PlayerShipsCardPadding;
 
     UPROPERTY(EditDefaultsOnly)
@@ -148,6 +151,9 @@ private:
 
     UPROPERTY()
     TArray<APDCardActor*> LocalPlayerCards;
+
+    UPROPERTY()
+    TArray<APDCardActor*> AlliedPlayerCards;
 
     UPROPERTY()
     TArray<APDCardActor*> LocationCards;
@@ -240,4 +246,7 @@ private:
 
     void InitCardActor(APDCardActor* CardActor, int64 EntityId, const FString& CardId);
     void QueueCardAnimation(APDCardActor* CardActor, FPDCardAnimation CardAnimation);
+
+    bool IsPlayerCard(APDCardActor* CardActor) const;
+    bool IsLocalPlayerCard(APDCardActor* CardActor) const;
 };
