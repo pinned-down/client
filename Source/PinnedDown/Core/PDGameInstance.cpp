@@ -5,7 +5,9 @@
 #include "Core/PDLog.h"
 #include "Data/PDCardSet.h"
 #include "Online/PDOnlineHttpRequestBuilder.h"
+#include "Online/Auth/PDMockAuthService.h"
 #include "Online/Auth/PDOnlineAuthService.h"
+#include "Online/Matchmaking/PDMockMatchmakingService.h"
 #include "Online/Matchmaking/PDOnlineMatchmakingService.h"
 
 void UPDGameInstance::Init()
@@ -16,6 +18,9 @@ void UPDGameInstance::Init()
     if (bMockBackend)
     {
         UE_LOG(LogPD, Log, TEXT("Using mock backend."));
+
+        AuthService = NewObject<UPDMockAuthService>(this);
+        MatchmakingService = NewObject<UPDMockMatchmakingService>(this);
     }
     else
     {
