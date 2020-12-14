@@ -6,7 +6,7 @@
 #include "Data/PDCardSet.h"
 #include "Online/PDOnlineHttpRequestBuilder.h"
 #include "Online/Auth/PDOnlineAuthService.h"
-#include "Online/Matchmaking/PDMatchmakingService.h"
+#include "Online/Matchmaking/PDOnlineMatchmakingService.h"
 
 void UPDGameInstance::Init()
 {
@@ -25,8 +25,9 @@ void UPDGameInstance::Init()
         OnlineAuthService->Init(HttpRequestBuilder);
         AuthService = OnlineAuthService;
 
-        MatchmakingService = NewObject<UPDMatchmakingService>(this);
-        MatchmakingService->Init(HttpRequestBuilder, AuthService);
+        UPDOnlineMatchmakingService* OnlineMatchmakingService = NewObject<UPDOnlineMatchmakingService>(this);
+        OnlineMatchmakingService->Init(HttpRequestBuilder, AuthService);
+        MatchmakingService = OnlineMatchmakingService;
     }
     
     // Load data.
