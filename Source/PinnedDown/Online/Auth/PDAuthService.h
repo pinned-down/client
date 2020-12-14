@@ -10,41 +10,18 @@
 
 #include "PDAuthService.generated.h"
 
-class UPDOnlineHttpRequestBuilder;
-
-UCLASS(BlueprintType, Config=Game)
+UCLASS(BlueprintType, Config = Game)
 class PINNEDDOWN_API UPDAuthService : public UPDOnlineService
 {
     GENERATED_BODY()
 
 public:
-    void Init(UPDOnlineHttpRequestBuilder* InHttpRequestBuilder);
+    UFUNCTION(BlueprintCallable)
+    virtual void Register(const FPDAuthRegisterRequestData& RequestData, const FPDAuthRegisterSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError);
 
     UFUNCTION(BlueprintCallable)
-    void Register(const FPDAuthRegisterRequestData& RequestData, const FPDAuthRegisterSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError);
-
-    UFUNCTION(BlueprintCallable)
-    void Login(const FPDAuthLoginSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError);
+    virtual void Login(const FPDAuthLoginSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError);
 
     UFUNCTION(BlueprintPure)
-    FString GetPlayerId() const;
-
-private:
-    UPROPERTY()
-    UPDOnlineHttpRequestBuilder* HttpRequestBuilder;
-
-    UPROPERTY(Config)
-    FString PlayerId;
-
-    UFUNCTION()
-    void OnRegisterSuccess(const FPDAuthRegisterResponseData& Response);
-
-    UFUNCTION()
-    void OnRegisterError(const FString& ErrorMessage);
-
-    UFUNCTION()
-    void OnLoginSuccess(const FPDAuthLoginResponseData& Response);
-
-    UFUNCTION()
-    void OnLoginError(const FString& ErrorMessage);
+    virtual FString GetPlayerId() const;
 };

@@ -5,7 +5,7 @@
 #include "Core/PDLog.h"
 #include "Data/PDCardSet.h"
 #include "Online/PDOnlineHttpRequestBuilder.h"
-#include "Online/Auth/PDAuthService.h"
+#include "Online/Auth/PDOnlineAuthService.h"
 #include "Online/Matchmaking/PDMatchmakingService.h"
 
 void UPDGameInstance::Init()
@@ -13,14 +13,22 @@ void UPDGameInstance::Init()
     Super::Init();
 
     // Create services.
-    HttpRequestBuilder = NewObject<UPDOnlineHttpRequestBuilder>(this);
+    if (bMockBackend)
+    {
+        UE_LOG(LogPD, Log, TEXT("Using mock backend."));
+    }
+    else
+    {
+        HttpRequestBuilder = NewObject<UPDOnlineHttpRequestBuilder>(this);
 
-    AuthService = NewObject<UPDAuthService>(this);
-    AuthService->Init(HttpRequestBuilder);
+        UPDOnlineAuthService* OnlineAuthService = NewObject<UPDOnlineAuthService>(this);
+        OnlineAuthService->Init(HttpRequestBuilder);
+        AuthService = OnlineAuthService;
 
-    MatchmakingService = NewObject<UPDMatchmakingService>(this);
-    MatchmakingService->Init(HttpRequestBuilder, AuthService);
-
+        MatchmakingService = NewObject<UPDMatchmakingService>(this);
+        MatchmakingService->Init(HttpRequestBuilder, AuthService);
+    }
+    
     // Load data.
     CardSet = NewObject<UPDCardSet>(this);
     CardSet->LoadFromDisk();

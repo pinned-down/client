@@ -13,7 +13,7 @@ class UPDCardSet;
 class UPDMatchmakingService;
 class UPDOnlineHttpRequestBuilder;
 
-UCLASS()
+UCLASS(Config = Game)
 class PINNEDDOWN_API UPDGameInstance : public UGameInstance
 {
     GENERATED_BODY()
@@ -36,6 +36,9 @@ public:
 private:
     UPROPERTY()
     UPDOnlineHttpRequestBuilder* HttpRequestBuilder;
+
+    UPROPERTY(Config)
+    bool bMockBackend;
 
     UPROPERTY()
     UPDAuthService* AuthService;
