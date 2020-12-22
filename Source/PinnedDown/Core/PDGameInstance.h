@@ -10,6 +10,7 @@ class UDataTable;
 
 class UPDAuthService;
 class UPDCardSet;
+class UPDDeckListService;
 class UPDMatchmakingService;
 class UPDOnlineHttpRequestBuilder;
 
@@ -31,6 +32,9 @@ public:
     UDataTable* GetCardMetadata() const;
 
     UFUNCTION(BlueprintPure)
+    UPDDeckListService* GetDeckListService() const;
+
+    UFUNCTION(BlueprintPure)
     UPDMatchmakingService* GetMatchmakingService() const;
 
 private:
@@ -42,6 +46,9 @@ private:
 
     UPROPERTY()
     UPDAuthService* AuthService;
+
+    UPROPERTY()
+    UPDDeckListService* DeckListService;
 
     UPROPERTY()
     UPDMatchmakingService* MatchmakingService;

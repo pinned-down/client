@@ -7,6 +7,7 @@
 #include "Online/PDOnlineHttpRequestBuilder.h"
 #include "Online/Auth/PDMockAuthService.h"
 #include "Online/Auth/PDOnlineAuthService.h"
+#include "Online/DeckList/PDMockDeckListService.h"
 #include "Online/Matchmaking/PDMockMatchmakingService.h"
 #include "Online/Matchmaking/PDOnlineMatchmakingService.h"
 
@@ -35,6 +36,8 @@ void UPDGameInstance::Init()
         MatchmakingService = OnlineMatchmakingService;
     }
     
+    DeckListService = NewObject<UPDMockDeckListService>(this);
+
     // Load data.
     CardSet = NewObject<UPDCardSet>(this);
     CardSet->LoadFromDisk();
@@ -76,6 +79,11 @@ UPDCardSet* UPDGameInstance::GetCardSet() const
 UDataTable* UPDGameInstance::GetCardMetadata() const
 {
     return CardMetadata;
+}
+
+UPDDeckListService* UPDGameInstance::GetDeckListService() const
+{
+    return DeckListService;
 }
 
 UPDMatchmakingService* UPDGameInstance::GetMatchmakingService() const
