@@ -10,6 +10,7 @@ class UDataTable;
 
 class UPDAuthService;
 class UPDCardSet;
+class UPDCollectionService;
 class UPDDeckListService;
 class UPDMatchmakingService;
 class UPDOnlineHttpRequestBuilder;
@@ -32,6 +33,9 @@ public:
     UDataTable* GetCardMetadata() const;
 
     UFUNCTION(BlueprintPure)
+    UPDCollectionService* GetCollectionService() const;
+
+    UFUNCTION(BlueprintPure)
     UPDDeckListService* GetDeckListService() const;
 
     UFUNCTION(BlueprintPure)
@@ -46,6 +50,9 @@ private:
 
     UPROPERTY()
     UPDAuthService* AuthService;
+
+    UPROPERTY()
+    UPDCollectionService* CollectionService;
 
     UPROPERTY()
     UPDDeckListService* DeckListService;
