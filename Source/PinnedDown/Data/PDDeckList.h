@@ -18,4 +18,7 @@ public:
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     FString Affiliation;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    TMap<FName, int32> Cards;
 };

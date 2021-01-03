@@ -8,6 +8,8 @@ void UPDMockDeckListService::Get(const FPDDeckListGetSuccessSignature& OnSuccess
     BlueWingDeck.Id = 1;
     BlueWingDeck.Name = TEXT("Blue Wing");
     BlueWingDeck.Affiliation = TEXT("BlueWing");
+    BlueWingDeck.Cards.Add(TEXT("Defiance"), 4);
+    BlueWingDeck.Cards.Add(TEXT("TRBArdor"), 1);
     Response.DeckLists.Add(BlueWingDeck);
 
     FPDDeckList GreenWingDeck;
