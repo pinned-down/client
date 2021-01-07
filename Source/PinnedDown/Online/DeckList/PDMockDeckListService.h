@@ -13,4 +13,8 @@ class PINNEDDOWN_API UPDMockDeckListService : public UPDDeckListService
 
 public:
     virtual void Get(const FPDDeckListGetSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError) override;
+    virtual void Put(const FPDDeckListPutRequestData& RequestData, const FPDDeckListPutSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError) override;
+
+private:
+    TArray<FPDDeckList> DeckLists;
 };
