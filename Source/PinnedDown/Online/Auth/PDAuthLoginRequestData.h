@@ -10,9 +10,15 @@ struct PINNEDDOWN_API FPDAuthLoginRequestData
     GENERATED_BODY()
 
 public:
-    FPDAuthLoginRequestData() { }
-    FPDAuthLoginRequestData(FString InPlayerId) { PlayerId = InPlayerId; }
+    UPROPERTY(BlueprintReadWrite)
+    FString Provider;
 
     UPROPERTY(BlueprintReadWrite)
-    FString PlayerId;
+    FString Key;
+
+    UPROPERTY(BlueprintReadWrite)
+    FString Context;
+
+    UPROPERTY(BlueprintReadWrite)
+    FString Role;
 };

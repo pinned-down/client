@@ -12,7 +12,6 @@ class PINNEDDOWN_API UPDMockAuthService : public UPDAuthService
     GENERATED_BODY()
 
 public:
-    virtual void Register(const FPDAuthRegisterRequestData& RequestData, const FPDAuthRegisterSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError) override;
     virtual void Login(const FPDAuthLoginSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError) override;
     virtual FString GetPlayerId() const override;
 

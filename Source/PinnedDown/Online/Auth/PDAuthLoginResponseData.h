@@ -12,4 +12,10 @@ struct PINNEDDOWN_API FPDAuthLoginResponseData
 public:
     UPROPERTY()
     FString Token;
+
+    UPROPERTY()
+    FString Provider;
+
+    UPROPERTY()
+    FString ProviderUserId;
 };
