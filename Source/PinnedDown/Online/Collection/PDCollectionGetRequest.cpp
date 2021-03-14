@@ -7,7 +7,7 @@
 
 void FPDCollectionGetRequest::Execute()
 {
-    TSharedRef<IHttpRequest> Request = HttpRequestBuilder->CreateHttpRequest(TEXT("/pinneddown-collection/get"));
+    FHttpRequestRef Request = HttpRequestBuilder->CreateHttpRequest(TEXT("/pinneddown-collection/get"));
 
     Request->OnProcessRequestComplete().BindRaw(this, &FPDCollectionGetRequest::OnHttpResponse);
 

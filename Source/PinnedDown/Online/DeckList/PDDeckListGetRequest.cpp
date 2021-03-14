@@ -7,7 +7,7 @@
 
 void FPDDeckListGetRequest::Execute()
 {
-    TSharedRef<IHttpRequest> Request = HttpRequestBuilder->CreateHttpRequest(TEXT("/pinneddown-decklist/get"));
+    FHttpRequestRef Request = HttpRequestBuilder->CreateHttpRequest(TEXT("/pinneddown-decklist/get"));
 
     Request->OnProcessRequestComplete().BindRaw(this, &FPDDeckListGetRequest::OnHttpResponse);
 

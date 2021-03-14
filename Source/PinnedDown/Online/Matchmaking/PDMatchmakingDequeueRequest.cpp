@@ -7,7 +7,7 @@
 
 void FPDMatchmakingDequeueRequest::Execute()
 {
-    TSharedRef<IHttpRequest> Request = HttpRequestBuilder->CreateHttpRequest(TEXT("/open-game-backend-matchmaking/client/dequeue"), RequestData);
+    FHttpRequestRef Request = HttpRequestBuilder->CreateHttpRequest(TEXT("/open-game-backend-matchmaking/client/dequeue"), RequestData);
 
     Request->OnProcessRequestComplete().BindRaw(this, &FPDMatchmakingDequeueRequest::OnHttpResponse);
 

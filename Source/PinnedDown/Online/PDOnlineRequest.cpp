@@ -7,6 +7,7 @@
 
 FPDOnlineRequest::FPDOnlineRequest()
 {
+    HttpRequestBuilder = nullptr;
 }
 
 FPDOnlineRequest::~FPDOnlineRequest()

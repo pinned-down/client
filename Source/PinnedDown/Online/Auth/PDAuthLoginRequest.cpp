@@ -7,7 +7,7 @@
 
 void FPDAuthLoginRequest::Execute()
 {
-    TSharedRef<IHttpRequest> Request = HttpRequestBuilder->CreateHttpRequest(TEXT("/open-game-backend-auth/login"), RequestData);
+    FHttpRequestRef Request = HttpRequestBuilder->CreateHttpRequest(TEXT("/open-game-backend-auth/login"), RequestData);
 
     Request->OnProcessRequestComplete().BindRaw(this, &FPDAuthLoginRequest::OnHttpResponse);
 

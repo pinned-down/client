@@ -7,7 +7,7 @@
 
 void FPDMatchmakingPollRequest::Execute()
 {
-    TSharedRef<IHttpRequest> Request = HttpRequestBuilder->CreateHttpRequest(TEXT("/open-game-backend-matchmaking/client/pollMatchmaking"), RequestData);
+    FHttpRequestRef Request = HttpRequestBuilder->CreateHttpRequest(TEXT("/open-game-backend-matchmaking/client/pollMatchmaking"), RequestData);
 
     Request->OnProcessRequestComplete().BindRaw(this, &FPDMatchmakingPollRequest::OnHttpResponse);
 

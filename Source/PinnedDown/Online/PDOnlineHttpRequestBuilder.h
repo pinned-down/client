@@ -17,11 +17,11 @@ class PINNEDDOWN_API UPDOnlineHttpRequestBuilder : public UObject
 public:
     FString Authorization;
 
-    TSharedRef<IHttpRequest> CreateHttpRequest(const FString& Url) const
+    FHttpRequestRef CreateHttpRequest(const FString& Url) const
     {
         FHttpModule* Http = &FHttpModule::Get();
 
-        TSharedRef<IHttpRequest> Request = Http->CreateRequest();
+        FHttpRequestRef Request = Http->CreateRequest();
         Request->SetVerb("GET");
         Request->SetURL(TEXT("http://localhost:9000") + Url);
         Request->SetHeader(TEXT("User-Agent"), TEXT("PinnedDown/1.0"));
@@ -36,12 +36,12 @@ public:
     }
 
     template<typename RequestDataType>
-    TSharedRef<IHttpRequest> CreateHttpRequest(const FString& Url, const RequestDataType& RequestData) const
+    FHttpRequestRef CreateHttpRequest(const FString& Url, const RequestDataType& RequestData) const
     {
         FString JsonString;
         FJsonObjectConverter::UStructToJsonObjectString(RequestData, JsonString);
 
-        TSharedRef<IHttpRequest> Request = CreateHttpRequest(Url);
+        FHttpRequestRef Request = CreateHttpRequest(Url);
         Request->SetVerb("POST");
         Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
         Request->SetContentAsString(JsonString);
