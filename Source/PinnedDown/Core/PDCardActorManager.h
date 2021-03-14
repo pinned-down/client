@@ -32,7 +32,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPDCardActorManagerThreatModifiersChangedSign
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerActiveAbilityEffectsChangedSignature, APDCardActor*, CardActor);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPDCardActorManagerBattleDestinyCardRevealedSignature, FPDBattleDestiny, BattleDestiny);
 
-UCLASS(BlueprintType, Blueprintable, meta=(Inject))
+UCLASS(BlueprintType, Blueprintable)
 class PINNEDDOWN_API APDCardActorManager : public AActor
 {
     GENERATED_BODY()
@@ -40,7 +40,7 @@ class PINNEDDOWN_API APDCardActorManager : public AActor
 public:
     APDCardActorManager(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-    void Init();
+    void Init(UPDEventManager* InEventManager);
     virtual void Tick(float DeltaSeconds) override;
 
     UFUNCTION(BlueprintPure)
@@ -140,7 +140,7 @@ private:
     UPROPERTY(EditDefaultsOnly)
     FVector PlayedCardLocation;
 
-    UPROPERTY(meta=(Inject))
+    UPROPERTY()
     UPDEventManager* EventManager;
 
     UPROPERTY()

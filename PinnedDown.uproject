@@ -11,9 +11,5 @@
 		}
 	],
 	"Plugins": [
-		{
-			"Name": "UnrealDI",
-			"Enabled": true
-		}
 	]
 }

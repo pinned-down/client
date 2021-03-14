@@ -7,6 +7,7 @@
 
 class UPDAction;
 class UPDEventManager;
+class UPDGameplayTagsManager;
 class UPDUIMode;
 
 UCLASS()
@@ -50,6 +51,9 @@ public:
 private:
     UPROPERTY(EditDefaultsOnly)
     FName ErrorLocalizationTableId;
+
+    UPROPERTY()
+    UPDGameplayTagsManager* GameplayTagsManager;
 
     UPROPERTY()
     UPDUIMode* UIMode;

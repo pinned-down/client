@@ -4,8 +4,6 @@
 #include "StompModule.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "UDIContext.h"
-
 #include "Core/PDLog.h"
 #include "Core/PDGameInstance.h"
 #include "Core/PDGameplayTagsManager.h"
@@ -26,15 +24,13 @@ void APDGameMode::InitGame(const FString& MapName, const FString& Options, FStri
     Super::InitGame(MapName, Options, ErrorMessage);
 
     // Setup game.
-    UDIContext = NewObject<UUDIContext>(this);
+    EventManager = NewObject<UPDEventManager>(this);
 
-    EventManager = UDIContext->Construct<UPDEventManager>();
+    CardActorManager = GetWorld()->SpawnActor<APDCardActorManager>();
+    CardActorManager->Init(EventManager);
 
-    CardActorManager = UDIContext->Spawn<APDCardActorManager>(GetWorld(), CardActorManagerClass);
-    CardActorManager->Init();
-
-    GameplayTagsManager = UDIContext->Construct<UPDGameplayTagsManager>();
-    GameplayTagsManager->Init();
+    GameplayTagsManager = NewObject<UPDGameplayTagsManager>(this);
+    GameplayTagsManager->Init(EventManager);
 
     // Connect to server.
     FString ServerEndpoint = UGameplayStatics::ParseOption(Options, TEXT("server"));
@@ -86,11 +82,6 @@ void APDGameMode::SendActionToServer(UPDAction* Action)
     FJsonObjectConverter::UStructToJsonObjectString(Action->GetClass(), Action, JsonString, 0, 0);
 
     StompClient->Send(Endpoint, JsonString);
-}
-
-UUDIContext* APDGameMode::GetUDIContext() const
-{
-    return UDIContext;
 }
 
 UPDEventManager* APDGameMode::GetEventManager() const

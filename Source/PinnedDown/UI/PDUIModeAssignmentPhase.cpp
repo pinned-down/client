@@ -4,9 +4,9 @@
 #include "Core/PDPlayerController.h"
 #include "Data/Components/PDOwnerComponent.h"
 
-void UPDUIModeAssignmentPhase::Init(APDPlayerController* InPlayerController)
+void UPDUIModeAssignmentPhase::Init(APDPlayerController* InPlayerController, UPDGameplayTagsManager* InGameplayTagsManager)
 {
-    Super::Init(InPlayerController);
+    Super::Init(InPlayerController, InGameplayTagsManager);
 
     OnHintChanged.Broadcast(NSLOCTEXT("PinnedDown", "UIMode.AssignmentPhase.Assign", "Select a starship to assign to an enemy!"));
 }

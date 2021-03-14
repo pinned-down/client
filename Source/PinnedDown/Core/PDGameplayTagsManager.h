@@ -8,20 +8,20 @@
 
 class UPDEventManager;
 
-UCLASS(BlueprintType, Blueprintable, meta=(Inject))
+UCLASS(BlueprintType, Blueprintable)
 class PINNEDDOWN_API UPDGameplayTagsManager : public UObject
 {
     GENERATED_BODY()
 
 public:
-    void Init();
+    void Init(UPDEventManager* InEventManager);
 
     TArray<FString> GetGlobalGameplayTags() const;
 
     bool HasAllGlobalTags(TArray<FString> Tags) const;
 
 private:
-    UPROPERTY(meta=(Inject))
+    UPROPERTY()
     UPDEventManager* EventManager;
 
     TArray<FString> GlobalGameplayTags;

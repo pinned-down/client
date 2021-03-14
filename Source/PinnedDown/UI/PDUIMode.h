@@ -18,7 +18,7 @@ class PINNEDDOWN_API UPDUIMode : public UObject
     GENERATED_BODY()
 
 public:
-    virtual void Init(APDPlayerController* InPlayerController);
+    virtual void Init(APDPlayerController* InPlayerController, UPDGameplayTagsManager* InGameplayTagsManager);
     virtual void HandleCardClicked(APDCardActor* ClickedActor);
 
     UPDGameplayTagsManager* GetGameplayTagsManager() const;
@@ -34,7 +34,7 @@ protected:
     virtual void NotifyOnHintChanged(const FText& Hint);
 
 private:
-    UPROPERTY(meta = (Inject))
+    UPROPERTY()
     UPDGameplayTagsManager* GameplayTagsManager;
 
     UPROPERTY()

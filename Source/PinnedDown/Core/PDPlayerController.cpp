@@ -2,8 +2,6 @@
 
 #include "Kismet/GameplayStatics.h"
 
-#include "UDIContext.h"
-
 #include "Core/PDCardActorManager.h"
 #include "Core/PDDelegate.h"
 #include "Core/PDGameInstance.h"
@@ -63,6 +61,8 @@ void APDPlayerController::BeginPlay()
     {
         CardActorManager->OnCardClicked.AddDynamic(this, &APDPlayerController::OnCardClicked);
     }
+
+    GameplayTagsManager = GameMode->GetGameplayTagsManager();
 }
 
 bool APDPlayerController::IsLocalPlayer(int64 PlayerEntityId) const
@@ -163,17 +163,10 @@ void APDPlayerController::OnTurnPhaseStarted(const UObject* EventData)
         return;
     }
 
-    UUDIContext* UDIContext = GameMode->GetUDIContext();
-
-    if (!IsValid(UDIContext))
-    {
-        return;
-    }
-
     switch (TurnPhasedStartedEvent->GetTurnPhase())
     {
     case EPDTurnPhase::TURNPHASE_Main:
-        SetUIMode(UDIContext->Construct<UPDUIModeMainPhase>());
+        SetUIMode(NewObject<UPDUIModeMainPhase>(this));
         break;
 
     case EPDTurnPhase::TURNPHASE_Attack:
@@ -181,11 +174,11 @@ void APDPlayerController::OnTurnPhaseStarted(const UObject* EventData)
         break;
 
     case EPDTurnPhase::TURNPHASE_Assignment:
-        SetUIMode(UDIContext->Construct<UPDUIModeAssignmentPhase>());
+        SetUIMode(NewObject<UPDUIModeAssignmentPhase>(this));
         break;
 
     case EPDTurnPhase::TURNPHASE_Fight:
-        SetUIMode(UDIContext->Construct<UPDUIModeFightPhase>());
+        SetUIMode(NewObject<UPDUIModeFightPhase>(this));
         break;
 
     case EPDTurnPhase::TURNPHASE_Jump:
@@ -252,6 +245,6 @@ void APDPlayerController::SetUIMode(UPDUIMode* NewUIMode)
     {
         UIMode->OnHintChanged.AddDynamic(this, &APDPlayerController::OnHintChanged);
 
-        UIMode->Init(this);
+        UIMode->Init(this, GameplayTagsManager);
     }
 }

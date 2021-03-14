@@ -10,9 +10,9 @@
 
 #include "Data/Components/PDOwnerComponent.h"
 
-void UPDUIModeFightPhase::Init(APDPlayerController* InPlayerController)
+void UPDUIModeFightPhase::Init(APDPlayerController* InPlayerController, UPDGameplayTagsManager* InGameplayTagsManager)
 {
-    Super::Init(InPlayerController);
+    Super::Init(InPlayerController, InGameplayTagsManager);
 
     OnHintChanged.Broadcast(NSLOCTEXT("PinnedDown", "UIMode.FightPhase.ChooseAction", "Click on a starship to resolve its fight, or select an effect from hand to play!"));
 }

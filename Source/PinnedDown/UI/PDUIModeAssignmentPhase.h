@@ -14,7 +14,7 @@ class PINNEDDOWN_API UPDUIModeAssignmentPhase : public UPDUIMode
     GENERATED_BODY()
 
 public:
-    virtual void Init(APDPlayerController* InPlayerController) override;
+    virtual void Init(APDPlayerController* InPlayerController, UPDGameplayTagsManager* InGameplayTagsManager) override;
     virtual void HandleCardClicked(APDCardActor* ClickedActor) override;
 
 private:

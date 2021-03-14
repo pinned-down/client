@@ -18,8 +18,7 @@ public class PinnedDown : ModuleRules
             "HTTP",
             "Json",
             "JsonUtilities",
-            "Stomp",
-            "UnrealDI"
+            "Stomp"
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

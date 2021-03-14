@@ -4,9 +4,10 @@
 #include "Data/PDCardType.h"
 #include "Data/Components/PDGameplayTagsComponent.h"
 
-void UPDUIMode::Init(APDPlayerController* InPlayerController)
+void UPDUIMode::Init(APDPlayerController* InPlayerController, UPDGameplayTagsManager* InGameplayTagsManager)
 {
     PlayerController = InPlayerController;
+    GameplayTagsManager = InGameplayTagsManager;
 }
 
 void UPDUIMode::HandleCardClicked(APDCardActor* ClickedActor)
