@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 
+#include "PDCollectionGetResponseDataItem.h"
+
 #include "PDCollectionGetResponseData.generated.h"
 
 USTRUCT(BlueprintType)
@@ -11,5 +13,5 @@ struct PINNEDDOWN_API FPDCollectionGetResponseData
 
 public:
     UPROPERTY(BlueprintReadWrite)
-    TMap<FName, int32> Collection;
+    TArray<FPDCollectionGetResponseDataItem> Collection;
 };

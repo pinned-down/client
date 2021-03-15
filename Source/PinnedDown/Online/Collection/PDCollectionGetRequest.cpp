@@ -7,7 +7,7 @@
 
 void FPDCollectionGetRequest::Execute()
 {
-    FHttpRequestRef Request = HttpRequestBuilder->CreateHttpRequest(TEXT("/pinneddown-collection/get"));
+    FHttpRequestRef Request = HttpRequestBuilder->CreateHttpRequest(TEXT("/open-game-backend-collection/client/collection"));
 
     Request->OnProcessRequestComplete().BindRaw(this, &FPDCollectionGetRequest::OnHttpResponse);
 
