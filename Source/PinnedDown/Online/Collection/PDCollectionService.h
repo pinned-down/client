@@ -6,6 +6,7 @@
 
 #include "Online/PDOnlineRequest.h"
 #include "Online/Collection/PDCollectionGetRequest.h"
+#include "Online/Collection/PDCollectionClaimRequest.h"
 
 #include "PDCollectionService.generated.h"
 
@@ -17,4 +18,7 @@ class PINNEDDOWN_API UPDCollectionService : public UPDOnlineService
 public:
     UFUNCTION(BlueprintCallable)
     virtual void Get(const FPDCollectionGetSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError);
+
+    UFUNCTION(BlueprintCallable)
+    virtual void Claim(const FPDCollectionClaimSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError);
 };

@@ -17,6 +17,7 @@ public:
     void Init(UPDOnlineHttpRequestBuilder* InHttpRequestBuilder);
 
     void Get(const FPDCollectionGetSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError) override;
+    void Claim(const FPDCollectionClaimSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError) override;
 
 private:
     UPROPERTY()
@@ -27,4 +28,10 @@ private:
 
     UFUNCTION()
     void OnGetError(const FString& ErrorMessage);
+
+    UFUNCTION()
+    void OnClaimSuccess(const FPDCollectionClaimResponseData& Response);
+
+    UFUNCTION()
+    void OnClaimError(const FString& ErrorMessage);
 };

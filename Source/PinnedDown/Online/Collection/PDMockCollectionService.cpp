@@ -17,3 +17,9 @@ void UPDMockCollectionService::Get(const FPDCollectionGetSuccessSignature& OnSuc
     
     OnSuccess.ExecuteIfBound(Response);
 }
+
+void UPDMockCollectionService::Claim(const FPDCollectionClaimSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError)
+{
+    FPDCollectionClaimResponseData Response;
+    OnSuccess.ExecuteIfBound(Response);
+}

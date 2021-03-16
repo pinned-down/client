@@ -35,6 +35,13 @@ public:
         return Request;
     }
 
+    FHttpRequestRef CreateHttpPostRequest(const FString& Url) const
+    {
+        FHttpRequestRef Request = CreateHttpRequest(Url);
+        Request->SetVerb("POST");
+        return Request;
+    }
+
     template<typename RequestDataType>
     FHttpRequestRef CreateHttpRequest(const FString& Url, const RequestDataType& RequestData) const
     {
