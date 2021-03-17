@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 
+#include "Data/PDDeckListItem.h"
+
 #include "PDDeckListPutRequestData.generated.h"
 
 USTRUCT(BlueprintType)
@@ -11,14 +13,8 @@ struct PINNEDDOWN_API FPDDeckListPutRequestData
 
 public:
     UPROPERTY(BlueprintReadWrite)
-    int64 Id;
+    FString Type;
 
     UPROPERTY(BlueprintReadWrite)
-    FString Name;
-
-    UPROPERTY(BlueprintReadWrite)
-    FString Affiliation;
-
-    UPROPERTY(BlueprintReadWrite)
-    TMap<FName, int32> Cards;
+    TArray<FPDDeckListItem> Items;
 };

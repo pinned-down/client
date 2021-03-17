@@ -10,6 +10,7 @@
 #include "Online/Collection/PDMockCollectionService.h"
 #include "Online/Collection/PDOnlineCollectionService.h"
 #include "Online/DeckList/PDMockDeckListService.h"
+#include "Online/DeckList/PDOnlineDeckListService.h"
 #include "Online/Matchmaking/PDMockMatchmakingService.h"
 #include "Online/Matchmaking/PDOnlineMatchmakingService.h"
 
@@ -25,6 +26,7 @@ void UPDGameInstance::Init()
         AuthService = NewObject<UPDMockAuthService>(this);
         MatchmakingService = NewObject<UPDMockMatchmakingService>(this);
         CollectionService = NewObject<UPDMockCollectionService>(this);
+        DeckListService = NewObject<UPDMockDeckListService>(this);
     }
     else
     {
@@ -41,9 +43,11 @@ void UPDGameInstance::Init()
         UPDOnlineCollectionService* OnlineCollectionService = NewObject<UPDOnlineCollectionService>(this);
         OnlineCollectionService->Init(HttpRequestBuilder);
         CollectionService = OnlineCollectionService;
+
+        UPDOnlineDeckListService* OnlineDeckListService = NewObject<UPDOnlineDeckListService>(this);
+        OnlineDeckListService->Init(HttpRequestBuilder);
+        DeckListService = OnlineDeckListService;
     }
-    
-    DeckListService = NewObject<UPDMockDeckListService>(this);
 
     // Load data.
     CardSet = NewObject<UPDCardSet>(this);

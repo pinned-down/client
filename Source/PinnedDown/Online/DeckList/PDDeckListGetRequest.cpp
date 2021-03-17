@@ -7,7 +7,7 @@
 
 void FPDDeckListGetRequest::Execute()
 {
-    FHttpRequestRef Request = HttpRequestBuilder->CreateHttpRequest(TEXT("/pinneddown-decklist/get"));
+    FHttpRequestRef Request = HttpRequestBuilder->CreateHttpRequest(TEXT("/open-game-backend-collection/client/loadouts"));
 
     Request->OnProcessRequestComplete().BindRaw(this, &FPDDeckListGetRequest::OnHttpResponse);
 
@@ -32,7 +32,7 @@ void FPDDeckListGetRequest::OnHttpResponse(FHttpRequestPtr Request, FHttpRespons
 
     FJsonObjectConverter::JsonObjectStringToUStruct<FPDDeckListGetResponseData>(Response->GetContentAsString(), &ResponseData, 0, 0);
 
-    UE_LOG(LogPDOnline, Log, TEXT("Deck Lists Fetched - Num: %i"), ResponseData.DeckLists.Num());
+    UE_LOG(LogPDOnline, Log, TEXT("Deck Lists Fetched - Num: %i"), ResponseData.Loadouts.Num());
 
     OnServiceSuccess.ExecuteIfBound(ResponseData);
 }

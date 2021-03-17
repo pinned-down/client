@@ -46,6 +46,23 @@ protected:
         return true;
     }
 
+    template<typename RequestType>
+    void OnPendingRequestSuccess()
+    {
+        TSharedPtr<RequestType> Request = StaticCastSharedPtr<RequestType>(GetCurrentPendingRequest());
+
+        if (!Request.IsValid())
+        {
+            return;
+        }
+
+        UE_LOG(LogPDOnline, Log, TEXT("Sucessfully executed request."));
+
+        Request->OnSuccess.ExecuteIfBound();
+
+        DequeueCurrentPendingRequest();
+    }
+
     template<typename RequestType, typename ResponseType>
     void OnPendingRequestSuccess(const ResponseType& Response)
     {

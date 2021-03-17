@@ -7,7 +7,9 @@
 
 void FPDDeckListPutRequest::Execute()
 {
-    FHttpRequestRef Request = HttpRequestBuilder->CreateHttpRequest(TEXT("/pinneddown-decklist/put"), RequestData);
+    FHttpRequestRef Request = LoadoutId != 0
+        ? HttpRequestBuilder->CreateHttpPutRequest(FString::Printf(TEXT("/open-game-backend-collection/client/loadouts/%ld"), LoadoutId), RequestData)
+        : HttpRequestBuilder->CreateHttpRequest(TEXT("/open-game-backend-collection/client/loadouts"), RequestData);
 
     Request->OnProcessRequestComplete().BindRaw(this, &FPDDeckListPutRequest::OnHttpResponse);
 
@@ -30,9 +32,14 @@ void FPDDeckListPutRequest::OnHttpResponse(FHttpRequestPtr Request, FHttpRespons
         return;
     }
 
-    FJsonObjectConverter::JsonObjectStringToUStruct<FPDDeckListPutResponseData>(Response->GetContentAsString(), &ResponseData, 0, 0);
-
-    UE_LOG(LogPDOnline, Log, TEXT("Deck list updated - Id: %d"), ResponseData.Id);
-
-    OnServiceSuccess.ExecuteIfBound(ResponseData);
+    if (LoadoutId != 0)
+    {
+        UE_LOG(LogPDOnline, Log, TEXT("Deck list updated - Id: %ld"), LoadoutId);
+    }
+    else
+    {
+        UE_LOG(LogPDOnline, Log, TEXT("Deck list created - Type: %s"), *RequestData.Type);
+    }
+    
+    OnServiceSuccess.ExecuteIfBound();
 }

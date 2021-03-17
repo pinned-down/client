@@ -8,44 +8,38 @@ void UPDMockDeckListService::Get(const FPDDeckListGetSuccessSignature& OnSuccess
     {
         FPDDeckList BlueWingDeck;
         BlueWingDeck.Id = 1;
-        BlueWingDeck.Name = TEXT("Blue Wing");
-        BlueWingDeck.Affiliation = TEXT("BlueWing");
-        BlueWingDeck.Cards.Add(TEXT("Defiance"), 4);
-        BlueWingDeck.Cards.Add(TEXT("TRBArdor"), 1);
+        BlueWingDeck.Type = TEXT("BlueWingDeck");
+        BlueWingDeck.Items.Add(FPDDeckListItem(TEXT("Defiance"), 4));
+        BlueWingDeck.Items.Add(FPDDeckListItem(TEXT("TRBArdor"), 1));
         DeckLists.Add(BlueWingDeck);
 
         FPDDeckList GreenWingDeck;
         GreenWingDeck.Id = 2;
-        GreenWingDeck.Name = TEXT("Green Wing");
-        GreenWingDeck.Affiliation = TEXT("GreenWing");
+        GreenWingDeck.Type = TEXT("GreenWingDeck");
         DeckLists.Add(GreenWingDeck);
 
         FPDDeckList PurpleWingDeck;
         PurpleWingDeck.Id = 3;
-        PurpleWingDeck.Name = TEXT("Purple Wing");
-        PurpleWingDeck.Affiliation = TEXT("PurpleWing");
+        PurpleWingDeck.Type = TEXT("PurpleWingDeck");
         DeckLists.Add(PurpleWingDeck);
     }
     
-    Response.DeckLists = DeckLists;
+    Response.Loadouts = DeckLists;
     OnSuccess.ExecuteIfBound(Response);
 }
 
-void UPDMockDeckListService::Put(const FPDDeckListPutRequestData& RequestData, const FPDDeckListPutSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError)
+void UPDMockDeckListService::Put(int64 LoadoutId, const FPDDeckListPutRequestData& RequestData, const FPDDeckListPutSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError)
 {
     for (FPDDeckList& DeckList : DeckLists)
     {
-        if (DeckList.Id != RequestData.Id)
+        if (DeckList.Id != LoadoutId)
         {
             continue;
         }
 
-        DeckList.Name = RequestData.Name;
-        DeckList.Affiliation = RequestData.Affiliation;
-        DeckList.Cards = RequestData.Cards;
+        DeckList.Type = RequestData.Type;
+        DeckList.Items = RequestData.Items;
     }
 
-    FPDDeckListPutResponseData Response;
-    Response.Id = RequestData.Id;
-    OnSuccess.ExecuteIfBound(Response);
+    OnSuccess.ExecuteIfBound();
 }

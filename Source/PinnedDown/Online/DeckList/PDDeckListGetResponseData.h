@@ -13,5 +13,5 @@ struct PINNEDDOWN_API FPDDeckListGetResponseData
 
 public:
     UPROPERTY(BlueprintReadWrite)
-    TArray<FPDDeckList> DeckLists;
+    TArray<FPDDeckList> Loadouts;
 };

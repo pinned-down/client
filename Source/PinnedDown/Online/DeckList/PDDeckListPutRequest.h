@@ -8,11 +8,10 @@
 
 #include "Core/PDDelegate.h"
 #include "Online/DeckList/PDDeckListPutRequestData.h"
-#include "Online/DeckList/PDDeckListPutResponseData.h"
 
 #include "PDDeckListPutRequest.generated.h"
 
-DECLARE_DYNAMIC_DELEGATE_OneParam(FPDDeckListPutSuccessSignature, const FPDDeckListPutResponseData&, Response);
+DECLARE_DYNAMIC_DELEGATE(FPDDeckListPutSuccessSignature);
 
 USTRUCT()
 struct PINNEDDOWN_API FPDDeckListPutRequest : public FPDOnlineRequest
@@ -20,8 +19,8 @@ struct PINNEDDOWN_API FPDDeckListPutRequest : public FPDOnlineRequest
     GENERATED_BODY()
 
 public:
+    int64 LoadoutId;
     FPDDeckListPutRequestData RequestData;
-    FPDDeckListPutResponseData ResponseData;
 
     FPDDeckListPutSuccessSignature OnSuccess;
     FPDDeckListPutSuccessSignature OnServiceSuccess;

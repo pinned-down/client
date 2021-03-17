@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 
+#include "PDDeckListItem.h"
+
 #include "PDDeckList.generated.h"
 
 USTRUCT(BlueprintType)
@@ -14,11 +16,8 @@ public:
     int64 Id;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    FString Name;
+    FString Type;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    FString Affiliation;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    TMap<FName, int32> Cards;
+    TArray<FPDDeckListItem> Items;
 };

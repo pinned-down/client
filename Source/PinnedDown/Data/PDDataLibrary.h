@@ -17,4 +17,10 @@ class PINNEDDOWN_API UPDDataLibrary : public UBlueprintFunctionLibrary
 public:
     UFUNCTION(BlueprintPure)
     static EPDCardAffiliation GetDeckAffiliation(const FPDDeckList& DeckList);
+
+    UFUNCTION(BlueprintPure)
+    static int32 GetCardCount(const FPDDeckList& DeckList, const FName& CardId);
+
+    UFUNCTION(BlueprintCallable)
+    static void SetCardCount(UPARAM(ref) FPDDeckList& DeckList, const FName& CardId, int32 NewCount);
 };

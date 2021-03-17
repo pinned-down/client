@@ -55,4 +55,12 @@ public:
 
         return Request;
     }
+
+    template<typename RequestDataType>
+    FHttpRequestRef CreateHttpPutRequest(const FString& Url, const RequestDataType& RequestData) const
+    {
+        FHttpRequestRef Request = CreateHttpRequest(Url, RequestData);
+        Request->SetVerb("PUT");
+        return Request;
+    }
 };
