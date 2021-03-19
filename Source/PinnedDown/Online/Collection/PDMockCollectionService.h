@@ -14,4 +14,5 @@ class PINNEDDOWN_API UPDMockCollectionService : public UPDCollectionService
 public:
     virtual void Get(const FPDCollectionGetSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError) override;
     virtual void Claim(const FPDCollectionClaimSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError) override;
+    virtual void OpenCardPack(const FString& ItemDefinitionId, const FPDCollectionOpenCardPackSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError) override;
 };

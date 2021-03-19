@@ -19,10 +19,22 @@ void UPDOnlineCollectionService::Get(const FPDCollectionGetSuccessSignature& OnS
 void UPDOnlineCollectionService::Claim(const FPDCollectionClaimSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError)
 {
     PDCreateDynamicDelegate(FPDCollectionClaimSuccessSignature, OnServiceSuccess, &UPDOnlineCollectionService::OnClaimSuccess);
-    PDCreateDynamicDelegate(FPDOnlineErrorSignature, OnServiceError, &UPDOnlineCollectionService::OnGetError);
+    PDCreateDynamicDelegate(FPDOnlineErrorSignature, OnServiceError, &UPDOnlineCollectionService::OnClaimError);
 
     TSharedPtr<FPDCollectionClaimRequest> Request = MakeShared<FPDCollectionClaimRequest>();
     Request->HttpRequestBuilder = HttpRequestBuilder;
+
+    AddRequest(Request, OnSuccess, OnServiceSuccess, OnError, OnServiceError);
+}
+
+void UPDOnlineCollectionService::OpenCardPack(const FString& ItemDefinitionId, const FPDCollectionOpenCardPackSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError)
+{
+    PDCreateDynamicDelegate(FPDCollectionOpenCardPackSuccessSignature, OnServiceSuccess, &UPDOnlineCollectionService::OnOpenCardPackSuccess);
+    PDCreateDynamicDelegate(FPDOnlineErrorSignature, OnServiceError, &UPDOnlineCollectionService::OnOpenCardPackError);
+
+    TSharedPtr<FPDCollectionOpenCardPackRequest> Request = MakeShared<FPDCollectionOpenCardPackRequest>();
+    Request->HttpRequestBuilder = HttpRequestBuilder;
+    Request->ItemDefinitionId = ItemDefinitionId;
 
     AddRequest(Request, OnSuccess, OnServiceSuccess, OnError, OnServiceError);
 }
@@ -43,6 +55,16 @@ void UPDOnlineCollectionService::OnClaimSuccess(const FPDCollectionClaimResponse
 }
 
 void UPDOnlineCollectionService::OnClaimError(const FString& ErrorMessage)
+{
+    OnPendingRequestError(ErrorMessage);
+}
+
+void UPDOnlineCollectionService::OnOpenCardPackSuccess(const FPDCollectionOpenCardPackResponseData& Response)
+{
+    OnPendingRequestSuccess<FPDCollectionOpenCardPackRequest, FPDCollectionOpenCardPackResponseData>(Response);
+}
+
+void UPDOnlineCollectionService::OnOpenCardPackError(const FString& ErrorMessage)
 {
     OnPendingRequestError(ErrorMessage);
 }

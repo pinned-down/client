@@ -14,6 +14,7 @@ void UPDMockCollectionService::Get(const FPDCollectionGetSuccessSignature& OnSuc
     Response.Collection.Add(FPDCollectionGetResponseDataItem(TEXT("TRBJustice"), 1));
     Response.Collection.Add(FPDCollectionGetResponseDataItem(TEXT("TRBTruth"), 1));
     Response.Collection.Add(FPDCollectionGetResponseDataItem(TEXT("TRBUnity"), 1));
+    Response.Collection.Add(FPDCollectionGetResponseDataItem(TEXT("PremiereCardPack"), 2));
     
     OnSuccess.ExecuteIfBound(Response);
 }
@@ -21,5 +22,18 @@ void UPDMockCollectionService::Get(const FPDCollectionGetSuccessSignature& OnSuc
 void UPDMockCollectionService::Claim(const FPDCollectionClaimSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError)
 {
     FPDCollectionClaimResponseData Response;
+    OnSuccess.ExecuteIfBound(Response);
+}
+
+void UPDMockCollectionService::OpenCardPack(const FString& ItemDefinitionId, const FPDCollectionOpenCardPackSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError)
+{
+    FPDCollectionOpenCardPackResponseData Response;
+
+    Response.AddedItems.Add(TEXT("Defiance"), 1);
+    Response.AddedItems.Add(TEXT("EvasionManeuver"), 1);
+    Response.AddedItems.Add(TEXT("FireAtWill"), 1);
+    Response.AddedItems.Add(TEXT("RaiseTheStakes"), 1);
+    Response.AddedItems.Add(TEXT("TargetEliminated"), 1);
+
     OnSuccess.ExecuteIfBound(Response);
 }

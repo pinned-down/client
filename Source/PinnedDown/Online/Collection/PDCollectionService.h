@@ -7,6 +7,7 @@
 #include "Online/PDOnlineRequest.h"
 #include "Online/Collection/PDCollectionGetRequest.h"
 #include "Online/Collection/PDCollectionClaimRequest.h"
+#include "Online/Collection/PDCollectionOpenCardPackRequest.h"
 
 #include "PDCollectionService.generated.h"
 
@@ -21,4 +22,7 @@ public:
 
     UFUNCTION(BlueprintCallable)
     virtual void Claim(const FPDCollectionClaimSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError);
+
+    UFUNCTION(BlueprintCallable)
+    virtual void OpenCardPack(const FString& ItemDefinitionId, const FPDCollectionOpenCardPackSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError);
 };
