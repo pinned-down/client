@@ -13,6 +13,7 @@ class UPDCardSet;
 class UPDCollectionService;
 class UPDDeckListService;
 class UPDMatchmakingService;
+class UPDQuestService;
 class UPDOnlineHttpRequestBuilder;
 
 UCLASS(Config = Game)
@@ -41,6 +42,9 @@ public:
     UFUNCTION(BlueprintPure)
     UPDMatchmakingService* GetMatchmakingService() const;
 
+    UFUNCTION(BlueprintPure)
+    UPDQuestService* GetQuestService() const;
+    
 private:
     UPROPERTY()
     UPDOnlineHttpRequestBuilder* HttpRequestBuilder;
@@ -60,6 +64,9 @@ private:
     UPROPERTY()
     UPDMatchmakingService* MatchmakingService;
 
+    UPROPERTY()
+    UPDQuestService* QuestService;
+    
     UPROPERTY()
     UPDCardSet* CardSet;
 

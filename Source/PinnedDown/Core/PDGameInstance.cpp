@@ -13,6 +13,8 @@
 #include "Online/DeckList/PDOnlineDeckListService.h"
 #include "Online/Matchmaking/PDMockMatchmakingService.h"
 #include "Online/Matchmaking/PDOnlineMatchmakingService.h"
+#include "Online/Quests/PDMockQuestService.h"
+#include "Online/Quests/PDOnlineQuestService.h"
 
 void UPDGameInstance::Init()
 {
@@ -27,6 +29,7 @@ void UPDGameInstance::Init()
         MatchmakingService = NewObject<UPDMockMatchmakingService>(this);
         CollectionService = NewObject<UPDMockCollectionService>(this);
         DeckListService = NewObject<UPDMockDeckListService>(this);
+        QuestService = NewObject<UPDMockQuestService>(this);
     }
     else
     {
@@ -47,6 +50,10 @@ void UPDGameInstance::Init()
         UPDOnlineDeckListService* OnlineDeckListService = NewObject<UPDOnlineDeckListService>(this);
         OnlineDeckListService->Init(HttpRequestBuilder);
         DeckListService = OnlineDeckListService;
+
+        UPDOnlineQuestService* OnlineQuestService = NewObject<UPDOnlineQuestService>(this);
+        OnlineQuestService->Init(HttpRequestBuilder);
+        QuestService = OnlineQuestService;
     }
 
     // Load data.
@@ -105,4 +112,9 @@ UPDDeckListService* UPDGameInstance::GetDeckListService() const
 UPDMatchmakingService* UPDGameInstance::GetMatchmakingService() const
 {
     return MatchmakingService;
+}
+
+UPDQuestService* UPDGameInstance::GetQuestService() const
+{
+    return QuestService;
 }
