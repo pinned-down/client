@@ -16,3 +16,13 @@ void UPDMockQuestService::CreateQuests(const FPDQuestsCreateSuccessSignature& On
     
 	OnSuccess.ExecuteIfBound(Response);
 }
+
+void UPDMockQuestService::FinishQuest(const FString& QuestDefinitionId,
+	const FPDQuestsFinishSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError)
+{
+	FPDQuestsFinishResponseData Response;
+	Response.RewardItemDefinitionId = TEXT("TestReward");
+	Response.RewardItemCount = 100;
+
+	OnSuccess.ExecuteIfBound(Response);
+}
