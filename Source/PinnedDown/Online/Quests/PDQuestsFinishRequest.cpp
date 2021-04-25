@@ -32,7 +32,8 @@ void FPDQuestsFinishRequest::OnHttpResponse(FHttpRequestPtr Request, FHttpRespon
 
 	FJsonObjectConverter::JsonObjectStringToUStruct<FPDQuestsFinishResponseData>(Response->GetContentAsString(), &ResponseData, 0, 0);
 
-	UE_LOG(LogPDOnline, Log, TEXT("Quest finished - Reward: %i x %s"), ResponseData.RewardItemCount, *ResponseData.RewardItemDefinitionId);
+	UE_LOG(LogPDOnline, Log, TEXT("Quest finished - %s, Reward: %i x %s"), *QuestDefinitionId, ResponseData.RewardItemCount, *ResponseData.RewardItemDefinitionId);
 
+	ResponseData.QuestDefinitionId = QuestDefinitionId;
 	OnServiceSuccess.ExecuteIfBound(ResponseData);
 }

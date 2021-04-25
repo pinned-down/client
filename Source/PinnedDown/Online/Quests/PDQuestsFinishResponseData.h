@@ -11,6 +11,9 @@ struct PINNEDDOWN_API FPDQuestsFinishResponseData
 
 public:
 	UPROPERTY(BlueprintReadOnly)
+	FString QuestDefinitionId;
+	
+	UPROPERTY(BlueprintReadOnly)
 	FString RewardItemDefinitionId;
 
 	UPROPERTY(BlueprintReadOnly)

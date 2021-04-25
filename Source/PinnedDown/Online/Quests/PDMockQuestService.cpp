@@ -21,6 +21,7 @@ void UPDMockQuestService::FinishQuest(const FString& QuestDefinitionId,
 	const FPDQuestsFinishSuccessSignature& OnSuccess, const FPDOnlineErrorSignature& OnError)
 {
 	FPDQuestsFinishResponseData Response;
+	Response.QuestDefinitionId = TEXT("ThreeWins");
 	Response.RewardItemDefinitionId = TEXT("TestReward");
 	Response.RewardItemCount = 100;
 
