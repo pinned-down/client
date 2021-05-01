@@ -19,4 +19,7 @@ public:
 
     UPROPERTY(BlueprintReadWrite)
     FString PlayerId;
+
+    UPROPERTY(BlueprintReadWrite)
+    FString Ticket;
 };

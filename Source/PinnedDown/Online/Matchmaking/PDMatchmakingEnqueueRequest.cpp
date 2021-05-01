@@ -20,7 +20,8 @@ void FPDMatchmakingEnqueueRequest::Execute()
 
 FString FPDMatchmakingEnqueueRequest::ToString()
 {
-    return FString::Printf(TEXT("FPDMatchmakingEnqueueRequest - Version: %s, Game Mode: %s, Region: %s"), *RequestData.Version, *RequestData.GameMode, *RequestData.Region);
+    return FString::Printf(TEXT("FPDMatchmakingEnqueueRequest - Player Id: %s, Version: %s, Game Mode: %s, Region: %s"),
+        *RequestData.PlayerId, *RequestData.Version, *RequestData.GameMode, *RequestData.Region);
 }
 
 void FPDMatchmakingEnqueueRequest::OnHttpResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)

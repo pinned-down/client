@@ -11,6 +11,9 @@ struct PINNEDDOWN_API FPDMatchmakingPollResponseData
 
 public:
     UPROPERTY(BlueprintReadOnly)
+    FString Ticket;
+    
+    UPROPERTY(BlueprintReadOnly)
     FString ServerId;
 
     UPROPERTY(BlueprintReadOnly)

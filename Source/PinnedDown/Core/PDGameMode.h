@@ -52,6 +52,8 @@ private:
     UPROPERTY()
     UPDGameplayTagsManager* GameplayTagsManager;
 
+    FString Ticket;
+    
     void OnConnected(const FString& ProtocolVersion, const FString& SessionId, const FString& ServerString);
     void OnConnectionError(const FString& Error);
 

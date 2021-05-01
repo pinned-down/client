@@ -34,13 +34,20 @@ void APDGameMode::InitGame(const FString& MapName, const FString& Options, FStri
 
     // Connect to server.
     FString ServerEndpoint = UGameplayStatics::ParseOption(Options, TEXT("server"));
-
+    Ticket = UGameplayStatics::ParseOption(Options, TEXT("ticket"));
+    
     if (ServerEndpoint.IsEmpty())
     {
         UE_LOG(LogPD, Error, TEXT("No server endpoint specified."));
         return;
     }
 
+    if (Ticket.IsEmpty())
+    {
+        UE_LOG(LogPD, Error, TEXT("No matchmaking ticket specified."));
+        return;
+    }
+    
     WebSocketUrl = TEXT("ws://") + ServerEndpoint + TEXT("/pinned-down");
 
     FStompModule& StompModule = FStompModule::Get();
@@ -125,7 +132,10 @@ void APDGameMode::OnConnected(const FString& ProtocolVersion, const FString& Ses
     // TODO(np): Handle missing handshake response.
     UPDJoinGameAction* JoinAction = NewObject<UPDJoinGameAction>(this);
     JoinAction->PlayerId = AuthService->GetPlayerId();
-
+    JoinAction->Ticket = Ticket;
+    
+    UE_LOG(LogPD, Log, TEXT("APDGameMode::OnConnected - Joining server - PlayerId: %s"), *JoinAction->PlayerId);
+    
     SendActionToServer(JoinAction);
 }
 
