@@ -26,7 +26,7 @@ void APDGameMode::InitGame(const FString& MapName, const FString& Options, FStri
     // Setup game.
     EventManager = NewObject<UPDEventManager>(this);
 
-    CardActorManager = GetWorld()->SpawnActor<APDCardActorManager>();
+    CardActorManager = GetWorld()->SpawnActor<APDCardActorManager>(CardActorManagerClass);
     CardActorManager->Init(EventManager);
 
     GameplayTagsManager = NewObject<UPDGameplayTagsManager>(this);
